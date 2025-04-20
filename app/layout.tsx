@@ -5,8 +5,8 @@ import { Suspense } from "react";
 import { MainNav } from "../components/main-nav";
 import { Button } from "../components/ui/button";
 import "./globals.css";
-// import { DynamicAuthProvider } from "@/lib/auth/dynamic"
 import { AuthButton } from "../components/auth-button";
+import Providers from "../components/providers";
 
 export default function RootLayout({
   children,
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* <DynamicAuthProvider> */}
+        <Providers>
         <header className="border-b">
           <div className="container flex h-16 items-center px-4 md:px-6">
             <Link href="/" className="flex items-center gap-2">
@@ -172,9 +172,9 @@ export default function RootLayout({
             <div className="mt-8 border-t pt-8 text-center text-sm text-gray-500">
               <p>© 2025 NFT IP Market. All rights reserved.</p>
             </div>
-          </div>
-        </footer>
-        {/* </DynamicAuthProvider> */}
+            </div>
+          </footer>
+        </Providers>
       </body>
     </html>
   );
