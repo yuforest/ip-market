@@ -1,27 +1,11 @@
 "use client";
-import { Wallet } from "lucide-react";
-import Link from "next/link";
-import { Button } from "../../../components/ui/button";
-// import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
-// import { useEffect } from "react"
+import {
+  DynamicWidget,
+} from "@dynamic-labs/sdk-react-core";
+// import DynamicMethods from "../../../components/Methods";
 
 export default function AuthPage() {
   // Dynamic SDK code commented out
-  // const { handleConnect, isAuthenticated, user } = useDynamicContext()
-
-  // // Redirect to dashboard if authenticated
-  // useEffect(() => {
-  //   if (isAuthenticated && user) {
-  //     window.location.href = "/dashboard"
-  //   }
-  // }, [isAuthenticated, user])
-
-  // Temporary wallet connect handler
-  const handleWalletConnect = () => {
-    alert("Wallet connection feature is currently disabled.");
-    // Add wallet connection logic here when implementing
-  };
-
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
@@ -38,21 +22,13 @@ export default function AuthPage() {
           <p className="text-sm text-center text-gray-500">
             Connect your wallet to login
           </p>
-          <Button
-            className="w-full flex items-center justify-center gap-2"
-            onClick={handleWalletConnect}
-          >
-            <Wallet className="h-4 w-4" />
-            Connect Wallet
-          </Button>
-        </div>
-
-        <div className="px-8 text-center text-sm text-muted-foreground">
-          <div className="underline hover:text-primary">
-            <Link href="/auth/register">Don't have an account? Sign up</Link>
+          <div className="w-full flex items-center justify-center">
+            <DynamicWidget innerButtonComponent={<>Connect Wallet</>} />
           </div>
         </div>
       </div>
+      {/* Dynamic SDKの機能をテストするためのコード */}
+      {/* <DynamicMethods /> */}
     </div>
   );
 }
