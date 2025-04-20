@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm"
+import { and, eq, count as countFn } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
 import { listings } from "../../../lib/db/schema"
@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
     const projectId = url.searchParams.get("projectId")
-    const sellerWalletId = url.searchParams.get("sellerWalletId")
+    const sellerWalletAddress = url.searchParams.get("sellerWalletAddress")
     const status = url.searchParams.get("status")
     const limit = Number.parseInt(url.searchParams.get("limit") || "10")
     const offset = Number.parseInt(url.searchParams.get("offset") || "0")
@@ -17,15 +17,15 @@ export async function GET(req: NextRequest) {
     const conditions = []
 
     if (projectId) {
-      conditions.push(eq(listings.projectId, projectId))
+      conditions.push(eq(listings.nftProjectId, projectId))
     }
 
-    if (sellerWalletId) {
-      conditions.push(eq(listings.sellerWalletId, sellerWalletId))
+    if (sellerWalletAddress) {
+      conditions.push(eq(listings.sellerWalletAddress, sellerWalletAddress))
     }
 
     if (status) {
-      conditions.push(eq(listings.status, status))
+      conditions.push(eq(listings.status, status as "draft" | "active" | "processing" | "sold" | "cancelled"))
     }
 
     // 出品一覧を取得
@@ -33,21 +33,16 @@ export async function GET(req: NextRequest) {
       where: conditions.length > 0 ? and(...conditions) : undefined,
       with: {
         project: true,
-        sellerWallet: {
-          with: {
-            user: true,
-          },
-        },
         transaction: true,
       },
       limit,
       offset,
-      orderBy: (listings, { desc }) => [desc(listings.listedAt)],
+      orderBy: (listings, { desc }) => [desc(listings.createdAt)],
     })
 
     // 総件数を取得
     const [{ count }] = await db
-      .select({ count: count() })
+      .select({ count: countFn() })
       .from(listings)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
 
@@ -68,21 +63,28 @@ export async function GET(req: NextRequest) {
 // 出品作成API
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, sellerWalletId, priceUSDC, escrowAddress } = await req.json()
+    const {
+      nftProjectId,
+      sellerWalletAddress,
+      status,
+      priceUsdc,
+      escrowAddress,
+    } = await req.json()
 
-    // 必須項目のバリデーション
-    if (!projectId || !sellerWalletId || !priceUSDC) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!nftProjectId || !sellerWalletAddress || !status || !priceUsdc || !escrowAddress) {
+      return NextResponse.json(
+        { error: "Required fields are missing" },
+        { status: 400 }
+      )
     }
 
-    // 出品を作成
     const [listing] = await db
       .insert(listings)
       .values({
-        projectId,
-        sellerWalletId,
-        status: "active", // デフォルトはアクティブ
-        priceUSDC,
+        nftProjectId,
+        sellerWalletAddress,
+        status,
+        priceUsdc,
         escrowAddress,
       })
       .returning()

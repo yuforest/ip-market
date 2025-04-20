@@ -1,105 +1,77 @@
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
-import { listings, transactions } from "../../../lib/db/schema"
+import { transactions } from "../../../lib/db/schema"
 
 // 取引作成API
 export async function POST(req: NextRequest) {
   try {
-    const { listingId, buyerWalletId, priceUSDC, txHash } = await req.json()
+    const {
+      listingId,
+      buyerWalletAddress,
+      buyerId,
+      priceUsdc,
+      txHash,
+    } = await req.json()
 
-    // 必須項目のバリデーション
-    if (!listingId || !buyerWalletId || !priceUSDC || !txHash) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!listingId || !buyerWalletAddress || !buyerId || !priceUsdc || !txHash) {
+      return NextResponse.json(
+        { error: "Required fields are missing" },
+        { status: 400 }
+      )
     }
 
-    // トランザクションを開始
-    const result = await db.transaction(async (tx) => {
-      // 取引を作成
-      const [transaction] = await tx
-        .insert(transactions)
-        .values({
-          listingId,
-          buyerWalletId,
-          priceUSDC,
-          txHash,
-        })
-        .returning()
+    const [transaction] = await db
+      .insert(transactions)
+      .values({
+        listingId,
+        buyerWalletAddress,
+        buyerId,
+        priceUsdc,
+        txHash,
+      })
+      .returning()
 
-      // 出品のステータスを更新
-      await tx.update(listings).set({ status: "sold" }).where(eq(listings.id, listingId))
-
-      return transaction
-    })
-
-    return NextResponse.json(result)
+    return NextResponse.json(transaction)
   } catch (error: any) {
     console.error("Failed to create transaction:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// 取引一覧取得API
+// 取引取得API
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
-    const buyerWalletId = url.searchParams.get("buyerWalletId")
+    const txId = url.searchParams.get("txId")
     const listingId = url.searchParams.get("listingId")
-    const limit = Number.parseInt(url.searchParams.get("limit") || "10")
-    const offset = Number.parseInt(url.searchParams.get("offset") || "0")
 
-    // クエリ条件を構築
-    const conditions = []
-
-    if (buyerWalletId) {
-      conditions.push(eq(transactions.buyerWalletId, buyerWalletId))
+    if (!txId && !listingId) {
+      return NextResponse.json(
+        { error: "Either txId or listingId is required" },
+        { status: 400 }
+      )
     }
 
-    if (listingId) {
-      conditions.push(eq(transactions.listingId, listingId))
+    let transaction
+
+    if (txId) {
+      transaction = await db.query.transactions.findFirst({
+        where: eq(transactions.txId, txId),
+      })
+    } else if (listingId) {
+      transaction = await db.query.transactions.findFirst({
+        where: eq(transactions.listingId, listingId),
+      })
     }
 
-    // 取引一覧を取得
-    const transactionsResult = await db.query.transactions.findMany({
-      where: conditions.length > 0 ? and(...conditions) : undefined,
-      with: {
-        listing: {
-          with: {
-            project: true,
-            sellerWallet: {
-              with: {
-                user: true,
-              },
-            },
-          },
-        },
-        buyerWallet: {
-          with: {
-            user: true,
-          },
-        },
-      },
-      limit,
-      offset,
-      orderBy: (transactions, { desc }) => [desc(transactions.executedAt)],
-    })
+    if (!transaction) {
+      return NextResponse.json({ error: "Transaction not found" }, { status: 404 })
+    }
 
-    // 総件数を取得
-    const [{ count }] = await db
-      .select({ count: count() })
-      .from(transactions)
-      .where(conditions.length > 0 ? and(...conditions) : undefined)
-
-    return NextResponse.json({
-      transactions: transactionsResult,
-      pagination: {
-        total: Number(count),
-        limit,
-        offset,
-      },
-    })
+    return NextResponse.json(transaction)
   } catch (error: any) {
-    console.error("Failed to get transactions:", error)
+    console.error("Failed to get transaction:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

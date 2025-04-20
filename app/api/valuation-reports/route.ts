@@ -3,25 +3,29 @@ import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
 import { valuationReports } from "../../../lib/db/schema"
 
-// 価値評価レポート作成API
+// 評価レポート作成API
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, estimatedValueUSD, agentId, modelVersion, featuresJSON, commentaryText } = await req.json()
+    const {
+      nftProjectId,
+      estimatedValueUsd,
+      modelVersion,
+      commentaryText,
+    } = await req.json()
 
-    // 必須項目のバリデーション
-    if (!projectId || !estimatedValueUSD || !agentId || !modelVersion || !featuresJSON || !commentaryText) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!nftProjectId || !estimatedValueUsd || !modelVersion) {
+      return NextResponse.json(
+        { error: "Required fields are missing" },
+        { status: 400 }
+      )
     }
 
-    // 価値評価レポートを作成
     const [report] = await db
       .insert(valuationReports)
       .values({
-        projectId,
-        estimatedValueUSD,
-        agentId,
+        nftProjectId,
+        estimatedValueUsd,
         modelVersion,
-        featuresJSON,
         commentaryText,
       })
       .returning()
@@ -33,24 +37,34 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// プロジェクトの最新価値評価レポート取得API
+// 評価レポート取得API
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
-    const projectId = url.searchParams.get("projectId")
+    const reportId = url.searchParams.get("reportId")
+    const nftProjectId = url.searchParams.get("nftProjectId")
 
-    if (!projectId) {
-      return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
+    if (!reportId && !nftProjectId) {
+      return NextResponse.json(
+        { error: "Either reportId or nftProjectId is required" },
+        { status: 400 }
+      )
     }
 
-    // プロジェクトの最新価値評価レポートを取得
-    const report = await db.query.valuationReports.findFirst({
-      where: eq(valuationReports.projectId, projectId),
-      orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
-    })
+    let report
+
+    if (reportId) {
+      report = await db.query.valuationReports.findFirst({
+        where: eq(valuationReports.id, reportId),
+      })
+    } else if (nftProjectId) {
+      report = await db.query.valuationReports.findMany({
+        where: eq(valuationReports.nftProjectId, nftProjectId),
+      })
+    }
 
     if (!report) {
-      return NextResponse.json({ error: "No valuation report found for this project" }, { status: 404 })
+      return NextResponse.json({ error: "Valuation report not found" }, { status: 404 })
     }
 
     return NextResponse.json(report)

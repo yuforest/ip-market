@@ -4,38 +4,13 @@ import { db } from "../../../../lib/db"
 import { listings } from "../../../../lib/db/schema"
 
 // 出品詳細取得API
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const listingId = params.id
-
-    // 出品詳細を取得
     const listing = await db.query.listings.findFirst({
-      where: eq(listings.id, listingId),
-      with: {
-        project: {
-          with: {
-            valuationReports: {
-              orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
-              limit: 1,
-            },
-            disclosures: true,
-          },
-        },
-        sellerWallet: {
-          with: {
-            user: true,
-          },
-        },
-        transaction: {
-          with: {
-            buyerWallet: {
-              with: {
-                user: true,
-              },
-            },
-          },
-        },
-      },
+      where: eq(listings.id, params.id),
     })
 
     if (!listing) {
@@ -50,27 +25,33 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // 出品更新API
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const listingId = params.id
-    const { status, priceUSDC, escrowAddress } = await req.json()
+    const {
+      status,
+      priceUsdc,
+      escrowAddress,
+    } = await req.json()
 
-    // 出品を更新
-    const [updatedListing] = await db
+    const [listing] = await db
       .update(listings)
       .set({
         status,
-        priceUSDC,
+        priceUsdc,
         escrowAddress,
+        updatedAt: new Date(),
       })
-      .where(eq(listings.id, listingId))
+      .where(eq(listings.id, params.id))
       .returning()
 
-    if (!updatedListing) {
+    if (!listing) {
       return NextResponse.json({ error: "Listing not found" }, { status: 404 })
     }
 
-    return NextResponse.json(updatedListing)
+    return NextResponse.json(listing)
   } catch (error: any) {
     console.error("Failed to update listing:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -78,18 +59,21 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // 出品削除API
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const listingId = params.id
+    const [listing] = await db
+      .delete(listings)
+      .where(eq(listings.id, params.id))
+      .returning()
 
-    // 出品を削除
-    const [deletedListing] = await db.delete(listings).where(eq(listings.id, listingId)).returning()
-
-    if (!deletedListing) {
+    if (!listing) {
       return NextResponse.json({ error: "Listing not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ message: "Listing deleted successfully" })
   } catch (error: any) {
     console.error("Failed to delete listing:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })

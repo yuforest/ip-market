@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
 import { projectDisclosures } from "../../../lib/db/schema"
@@ -6,14 +6,20 @@ import { projectDisclosures } from "../../../lib/db/schema"
 // プロジェクト開示情報作成API
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, disclosureType, title, description } = await req.json()
+    const {
+      projectId,
+      disclosureType,
+      title,
+      description,
+    } = await req.json()
 
-    // 必須項目のバリデーション
-    if (!projectId || !disclosureType || !title || !description) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!projectId || !disclosureType || !title) {
+      return NextResponse.json(
+        { error: "Required fields are missing" },
+        { status: 400 }
+      )
     }
 
-    // プロジェクト開示情報を作成
     const [disclosure] = await db
       .insert(projectDisclosures)
       .values({
@@ -31,33 +37,39 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// プロジェクト開示情報一覧取得API
+// プロジェクト開示情報取得API
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
+    const disclosureId = url.searchParams.get("disclosureId")
     const projectId = url.searchParams.get("projectId")
-    const disclosureType = url.searchParams.get("disclosureType")
 
-    if (!projectId) {
-      return NextResponse.json({ error: "Project ID is required" }, { status: 400 })
+    if (!disclosureId && !projectId) {
+      return NextResponse.json(
+        { error: "Either disclosureId or projectId is required" },
+        { status: 400 }
+      )
     }
 
-    // クエリ条件を構築
-    const conditions = [eq(projectDisclosures.projectId, projectId)]
+    let disclosure
 
-    if (disclosureType) {
-      conditions.push(eq(projectDisclosures.disclosureType, disclosureType))
+    if (disclosureId) {
+      disclosure = await db.query.projectDisclosures.findFirst({
+        where: eq(projectDisclosures.id, disclosureId),
+      })
+    } else if (projectId) {
+      disclosure = await db.query.projectDisclosures.findMany({
+        where: eq(projectDisclosures.projectId, projectId),
+      })
     }
 
-    // プロジェクト開示情報一覧を取得
-    const disclosures = await db.query.projectDisclosures.findMany({
-      where: and(...conditions),
-      orderBy: (disclosures, { desc }) => [desc(disclosures.uploadedAt)],
-    })
+    if (!disclosure) {
+      return NextResponse.json({ error: "Project disclosure not found" }, { status: 404 })
+    }
 
-    return NextResponse.json(disclosures)
+    return NextResponse.json(disclosure)
   } catch (error: any) {
-    console.error("Failed to get project disclosures:", error)
+    console.error("Failed to get project disclosure:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

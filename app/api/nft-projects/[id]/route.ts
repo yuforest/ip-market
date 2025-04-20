@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../../lib/db"
 import { nftProjects } from "../../../../lib/db/schema"
 
-// プロジェクト詳細取得API
+// NFTプロジェクト詳細取得API
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -14,17 +14,17 @@ export async function GET(
     })
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+      return NextResponse.json({ error: "NFT project not found" }, { status: 404 })
     }
 
     return NextResponse.json(project)
   } catch (error: any) {
-    console.error("Failed to get project:", error)
+    console.error("Failed to get NFT project:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// プロジェクト更新API
+// NFTプロジェクト更新API
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -58,17 +58,17 @@ export async function PUT(
       .returning()
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+      return NextResponse.json({ error: "NFT project not found" }, { status: 404 })
     }
 
     return NextResponse.json(project)
   } catch (error: any) {
-    console.error("Failed to update project:", error)
+    console.error("Failed to update NFT project:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// プロジェクト削除API
+// NFTプロジェクト削除API
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -80,12 +80,12 @@ export async function DELETE(
       .returning()
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
+      return NextResponse.json({ error: "NFT project not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ message: "Project deleted successfully" })
+    return NextResponse.json({ message: "NFT project deleted successfully" })
   } catch (error: any) {
-    console.error("Failed to delete project:", error)
+    console.error("Failed to delete NFT project:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
-}
+} 

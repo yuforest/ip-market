@@ -1,4 +1,4 @@
-import { and, eq, like, or } from "drizzle-orm"
+import { and, eq, like, or, count } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
 import { listings, nftProjects } from "../../../lib/db/schema"
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (category) {
-      conditions.push(eq(nftProjects.category, category))
+      conditions.push(eq(nftProjects.category, category as "Art" | "PFP" | "Game" | "Music" | "Utility"))
     }
 
     if (ownerId) {
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       with: {
         owner: true,
         valuationReports: {
-          orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+          orderBy: (reports, { desc }) => [desc(reports.createdAt)],
           limit: 1,
         },
         listings: {
@@ -48,15 +48,16 @@ export async function GET(req: NextRequest) {
     })
 
     // 総件数を取得
-    const [{ count }] = await db
+    const result = await db
       .select({ count: count() })
       .from(nftProjects)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
+    const totalCount = Number(result[0].count)
 
     return NextResponse.json({
       projects,
       pagination: {
-        total: Number(count),
+        total: totalCount,
         limit,
         offset,
       },
@@ -89,7 +90,6 @@ export async function POST(req: NextRequest) {
         category,
         royaltyPct,
         ownerId,
-        metadataCID,
       })
       .returning()
 

@@ -1,42 +1,25 @@
 import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
-import { users, wallets } from "../../../lib/db/schema"
+import { users } from "../../../lib/db/schema"
 
 // ユーザー作成API
 export async function POST(req: NextRequest) {
   try {
-    const { did, walletAddress, chainId } = await req.json()
-    // userType パラメータを削除
+    const { dynamicUserId } = await req.json()
 
-    // DIDとウォレット情報が必須
-    if (!did || !walletAddress || !chainId) {
-      return NextResponse.json({ error: "DID, wallet address, and chain ID are required" }, { status: 400 })
+    if (!dynamicUserId) {
+      return NextResponse.json({ error: "dynamicUserId is required" }, { status: 400 })
     }
 
-    // トランザクションを開始
-    const result = await db.transaction(async (tx) => {
-      // ユーザーを作成（userType フィールドなし）
-      const [user] = await tx
-        .insert(users)
-        .values({
-          did,
-          // userType フィールドを削除
-        })
-        .returning()
-
-      // ウォレットを作成（必須）
-      await tx.insert(wallets).values({
-        address: walletAddress,
-        chainId,
-        userId: user.id,
-        isPrimary: true,
+    const [user] = await db
+      .insert(users)
+      .values({
+        dynamicUserId,
       })
+      .returning()
 
-      return user
-    })
-
-    return NextResponse.json(result)
+    return NextResponse.json(user)
   } catch (error: any) {
     console.error("Failed to create user:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -47,30 +30,22 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
-    const did = url.searchParams.get("did")
+    const dynamicUserId = url.searchParams.get("dynamicUserId")
     const userId = url.searchParams.get("userId")
 
-    if (!did && !userId) {
-      return NextResponse.json({ error: "Either DID or userId is required" }, { status: 400 })
+    if (!dynamicUserId && !userId) {
+      return NextResponse.json({ error: "Either dynamicUserId or userId is required" }, { status: 400 })
     }
 
     let user
 
-    if (did) {
-      // DIDでユーザーを検索
+    if (dynamicUserId) {
       user = await db.query.users.findFirst({
-        where: eq(users.did, did),
-        with: {
-          wallets: true,
-        },
+        where: eq(users.dynamicUserId, dynamicUserId),
       })
     } else if (userId) {
-      // ユーザーIDでユーザーを検索
       user = await db.query.users.findFirst({
         where: eq(users.id, userId),
-        with: {
-          wallets: true,
-        },
       })
     }
 
