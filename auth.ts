@@ -3,11 +3,10 @@ import NextAuth from "next-auth";
 import type { NextAuthConfig } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
-import { validateJWT } from "./lib/auth/authHelpers";
-
-type User = {
-  id: string;
-};
+import { validateJWT } from "@/lib/auth/authHelpers";
+import { db } from "@/lib/db";
+import { users, User, wallets } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export const config = {
   theme: {
@@ -30,15 +29,29 @@ export const config = {
 
         const jwtPayload = await validateJWT(token);
 
-        if (jwtPayload) {
-          // Transform the JWT payload into your user object
-          const user: User = {
-            id: jwtPayload.sub || "",
-          };
-          return user;
-        } else {
-          return null;
+        // userが存在しなければ作成する
+        await db.insert(users)
+            .values({
+              sub: jwtPayload?.sub || "",
+            })
+            .onConflictDoNothing();
+        const user = await db.query.users.findFirst({
+          where: eq(users.sub, jwtPayload?.sub || ""),
+        });
+        if (!user) {
+          throw new Error("User not found");
         }
+        // userのwalletも作成する
+        await db.insert(wallets)
+            .values({
+              userId: user?.id,
+              address: jwtPayload?.verified_credentials[0].address,
+              chain: jwtPayload?.verified_credentials[0].chain,
+              dynamicId: jwtPayload?.verified_credentials[0].id,
+            })
+            .onConflictDoNothing();
+
+        return user || null;
       },
     }),
   ],

@@ -4,20 +4,22 @@ import { pgTable, text, timestamp, boolean, uuid, doublePrecision } from "drizzl
 // ユーザーテーブル
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  did: text("did").notNull().unique(), // Dynamic IDを保存
+  sub: text("sub").notNull().unique(), // Dynamic IDを保存
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // ウォレットテーブル
 export const wallets = pgTable("wallets", {
   id: uuid("id").primaryKey().defaultRandom(),
   address: text("address").notNull(),
-  chainId: text("chain_id").notNull(),
+  chain: text("chain").notNull(),
+  dynamicId: text("dynamic_id").notNull().unique(),
   userId: uuid("user_id")
     .references(() => users.id, { onDelete: "cascade" })
     .notNull(),
-  isPrimary: boolean("is_primary").default(false).notNull(),
-  linkedAt: timestamp("linked_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // NFTプロジェクトテーブル
@@ -153,3 +155,6 @@ export const projectDisclosuresRelations = relations(projectDisclosures, ({ one 
     references: [nftProjects.id],
   }),
 }))
+
+
+export type User = typeof users.$inferSelect;
