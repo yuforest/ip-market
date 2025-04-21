@@ -5,9 +5,8 @@ import { Suspense } from "react";
 import { MainNav } from "../components/main-nav";
 import { Button } from "../components/ui/button";
 import "./globals.css";
-import { AuthButton } from "../components/auth-button";
 import Providers from "../components/providers";
-
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 export default function RootLayout({
   children,
 }: {
@@ -35,7 +34,7 @@ export default function RootLayout({
                   </Link>
                 </Button>
 
-                <AuthButton />
+                <DynamicWidget innerButtonComponent={<>Connect Wallet</>} />
               </div>
             </div>
           </div>
