@@ -6,12 +6,16 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@dynamic-labs/ethereum": "^4.12.4",
     "@dynamic-labs/sdk-react-core": "^4.12.4",
     "@dynamic-labs/wagmi-connector": "^4.12.4",
+    "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-accordion": "^1.2.7",
     "@radix-ui/react-checkbox": "^1.2.2",
     "@radix-ui/react-dialog": "^1.1.10",
@@ -23,7 +27,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
-    "drizzle-kit": "^0.31.0",
     "drizzle-orm": "^0.42.0",
     "ethers": "^6.13.5",
     "jsonwebtoken": "^9.0.2",
@@ -47,6 +50,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.21",
+    "drizzle-kit": "^0.31.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "postcss": "^8.5.3",
