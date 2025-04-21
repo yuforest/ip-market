@@ -45,7 +45,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-200 to-teal-200 rounded-2xl transform rotate-3"></div>
                 <div className="absolute inset-0 bg-white rounded-2xl shadow-lg overflow-hidden">
                   <img
-                    src="/placeholder.svg?height=500&width=500"
+                    src="https://placeholder.pics/svg/500"
                     alt="NFT IP Marketplace"
                     className="w-full h-full object-cover"
                   />

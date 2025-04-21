@@ -8,7 +8,7 @@ export default function FeaturedProjects() {
     {
       id: "1",
       name: "CryptoKitties Japan",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "15,000 USDC",
       category: "Art",
       holders: 1200,
@@ -17,7 +17,7 @@ export default function FeaturedProjects() {
     {
       id: "2",
       name: "Manga Heroes",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "25,000 USDC",
       category: "Entertainment",
       holders: 3500,
@@ -26,7 +26,7 @@ export default function FeaturedProjects() {
     {
       id: "3",
       name: "Tokyo Punks",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "18,000 USDC",
       category: "Collectibles",
       holders: 2200,
