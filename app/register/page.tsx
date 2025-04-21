@@ -40,15 +40,35 @@ export default function RegisterProjectPage() {
     setStep(step - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submit project:", {
-      projectName,
-      contractAddress,
-      description,
-      category,
-    });
-    // Submit process
+
+    try {
+      // 価格をUSDCの小数点に変換（6桁）
+      const priceInUSDC = parseUnits(price, 6);
+
+      // トランザクションの準備と署名
+      const hash = await walletClient.writeContract({
+        address: escrowContractAddress,
+        abi: escrowContractABI,
+        functionName: "registerSale",
+        args: [collectionAddress, priceInUSDC],
+      });
+
+      // バックエンドに登録情報を保存（オプション）
+      await fetch("/api/record-collection-listing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transactionHash: hash,
+          collectionAddress,
+          price,
+          sellerAddress: primaryWallet.address,
+        }),
+      });
+    } catch (error) {
+      console.error("登録エラー:", error);
+    }
   };
 
   return (
