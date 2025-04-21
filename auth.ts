@@ -55,6 +55,13 @@ export const config = {
       },
     }),
   ],
+  callbacks: {
+    async session({ session, token }) {
+      // ユーザーのIDをセッションに追加
+      session.user.id = token.sub || "";
+      return session;
+    },
+  },
 } satisfies NextAuthConfig;
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);
