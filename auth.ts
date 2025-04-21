@@ -7,9 +7,6 @@ import { validateJWT } from "./lib/auth/authHelpers";
 
 type User = {
   id: string;
-  address: string;
-  addresses: string[];
-  sub: string;
 };
 
 export const config = {
@@ -32,17 +29,11 @@ export const config = {
         }
 
         const jwtPayload = await validateJWT(token);
-        console.log(`jwtPayload: ${jwtPayload?.sub}`)
-        console.log(`jwtPayload: ${jwtPayload?.iat}`)
-        console.log(`jwtPayload: ${jwtPayload?.verified_credentials[0]?.address}`)
 
         if (jwtPayload) {
           // Transform the JWT payload into your user object
           const user: User = {
             id: jwtPayload.sub || "",
-            address: "test",
-            addresses: jwtPayload.verified_credentials.map((credential: any) => credential.address),
-            sub: jwtPayload.sub,
           };
           return user;
         } else {
