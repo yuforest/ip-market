@@ -64,6 +64,12 @@ export async function ProjectList({ projects }: ProjectListProps) {
                       Edit
                     </Link>
                   </Button>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/user/projects/${project.id}/listing`}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      Listing
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </div>

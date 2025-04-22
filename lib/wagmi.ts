@@ -1,14 +1,21 @@
 
-import { http, createConfig } from "wagmi";
-import { mainnet } from "wagmi/chains";
+import { createConfig, http } from "wagmi";
+import { soneiumMinato } from "wagmi/chains";
+
+const minato = {
+  ...soneiumMinato,
+  name: "Soneium Minato",
+  // Memo: Download from https://soneium.org/en/brand-kit/
+  iconUrl: "/symbol-full-color.svg",
+};
+
 
 export const config = createConfig({
   // make sure to update the chains in the dashboard
-  chains: [mainnet],
+  chains: [minato],
   multiInjectedProviderDiscovery: false,
-  ssr: true,
   transports: {
-    [mainnet.id]: http(),
+    [minato.id]: http(),
   },
 });
 
