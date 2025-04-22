@@ -19,9 +19,9 @@ export function MainNav() {
       active: pathname === "/",
     },
     {
-      href: "/marketplace",
+      href: "/projects",
       label: "Marketplace",
-      active: pathname === "/marketplace",
+      active: pathname === "/projects",
     },
     {
       href: "/user/projects/new",

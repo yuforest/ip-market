@@ -92,7 +92,8 @@ export const projectDisclosures = pgTable("project_disclosures", {
   disclosureType: text("disclosure_type").notNull(), // enum: financial, license, team, tokenomics, ...
   title: text("title").notNull(),
   description: text("description").notNull(),
-  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // リレーション定義
@@ -161,3 +162,5 @@ export const projectDisclosuresRelations = relations(projectDisclosures, ({ one 
 
 
 export type User = typeof users.$inferSelect;
+export type NftProject = typeof nftProjects.$inferSelect;
+export type Listing = typeof listings.$inferSelect;

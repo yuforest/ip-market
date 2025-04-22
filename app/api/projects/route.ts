@@ -1,4 +1,4 @@
-import { and, eq, like, or } from "drizzle-orm"
+import { and, eq, like, or, sql } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
 import { listings, nftProjects } from "../../../lib/db/schema"
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (category) {
-      conditions.push(eq(nftProjects.category, category))
+      conditions.push(eq(nftProjects.category, category as any))
     }
 
     if (ownerId) {
@@ -42,14 +42,14 @@ export async function GET(req: NextRequest) {
           limit: 1,
         },
       },
+      orderBy: (projects, { desc }) => [desc(projects.createdAt)],
       limit,
       offset,
-      orderBy: (projects, { desc }) => [desc(projects.createdAt)],
     })
 
     // 総件数を取得
-    const [{ count }] = await db
-      .select({ count: count() })
+    const count = await db
+      .select({ count: sql<number>`count(*)` })
       .from(nftProjects)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
 
