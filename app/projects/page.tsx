@@ -21,7 +21,7 @@ export default function MarketplacePage() {
     {
       id: "1",
       name: "CryptoKitties Japan",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "15,000 USDC",
       category: "Art",
       holders: 1200,
@@ -30,7 +30,7 @@ export default function MarketplacePage() {
     {
       id: "2",
       name: "Manga Heroes",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "25,000 USDC",
       category: "Entertainment",
       holders: 3500,
@@ -39,7 +39,7 @@ export default function MarketplacePage() {
     {
       id: "3",
       name: "Tokyo Punks",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "18,000 USDC",
       category: "Collectibles",
       holders: 2200,
@@ -48,7 +48,7 @@ export default function MarketplacePage() {
     {
       id: "4",
       name: "Anime Avatars",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "12,000 USDC",
       category: "Avatars",
       holders: 1800,
@@ -57,7 +57,7 @@ export default function MarketplacePage() {
     {
       id: "5",
       name: "Crypto Samurai",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "30,000 USDC",
       category: "Gaming",
       holders: 4200,
@@ -66,7 +66,7 @@ export default function MarketplacePage() {
     {
       id: "6",
       name: "Digital Landscapes",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "https://placeholder.pics/svg/500",
       price: "8,500 USDC",
       category: "Art",
       holders: 950,

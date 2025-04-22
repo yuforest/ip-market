@@ -6,8 +6,8 @@ import { AlertCircle, ArrowRight, Upload } from "lucide-react";
 import { useState } from "react";
 import { parseUnits } from "viem";
 import { useAccount, useWalletClient } from "wagmi";
-import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,19 +15,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { Textarea } from "../../components/ui/textarea";
-import { escrowContractABI } from "../../constants/abis";
-import { escrowContractAddress } from "../../constants/contracts";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { escrowContractABI } from "@/constants/abis";
+import { escrowContractAddress } from "@/constants/contracts";
 
 export default function RegisterProjectPage() {
   const [step, setStep] = useState(1);

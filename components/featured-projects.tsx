@@ -45,7 +45,7 @@ export default function FeaturedProjects() {
             <p className="text-gray-500 mt-1">Popular NFT IP Collections</p>
           </div>
           <Link
-            href="/marketplace"
+            href="/projects"
             className="text-rose-500 hover:text-rose-600 font-medium mt-2 md:mt-0"
           >
             View All →

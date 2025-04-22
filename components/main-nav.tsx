@@ -19,19 +19,19 @@ export function MainNav() {
       active: pathname === "/",
     },
     {
-      href: "/marketplace",
+      href: "/projects",
       label: "Marketplace",
-      active: pathname === "/marketplace",
+      active: pathname === "/projects",
     },
     {
-      href: "/register",
+      href: "/user/projects/new",
       label: "Register Project",
-      active: pathname === "/register",
+      active: pathname === "/user/projects/new",
     },
     {
-      href: "/dashboard",
+      href: "/user/dashboard",
       label: "My Dashboard",
-      active: pathname === "/dashboard",
+      active: pathname === "/user/dashboard",
     },
   ];
 

@@ -1,4 +1,4 @@
-import { and, eq, like, or } from "drizzle-orm"
+import { and, eq, like, or, sql } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 import { db } from "../../../lib/db"
 import { listings, nftProjects } from "../../../lib/db/schema"
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (category) {
-      conditions.push(eq(nftProjects.category, category))
+      conditions.push(eq(nftProjects.category, category as any))
     }
 
     if (ownerId) {
@@ -42,14 +42,14 @@ export async function GET(req: NextRequest) {
           limit: 1,
         },
       },
+      orderBy: (projects, { desc }) => [desc(projects.createdAt)],
       limit,
       offset,
-      orderBy: (projects, { desc }) => [desc(projects.createdAt)],
     })
 
     // 総件数を取得
-    const [{ count }] = await db
-      .select({ count: count() })
+    const count = await db
+      .select({ count: sql<number>`count(*)` })
       .from(nftProjects)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
 
@@ -63,39 +63,6 @@ export async function GET(req: NextRequest) {
     })
   } catch (error: any) {
     console.error("Failed to get projects:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-}
-
-// プロジェクト作成API
-export async function POST(req: NextRequest) {
-  try {
-    const { name, collectionAddress, chainId, description, category, royaltyPct, ownerId, metadataCID } =
-      await req.json()
-
-    // 必須項目のバリデーション
-    if (!name || !collectionAddress || !chainId || !description || !category || !ownerId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
-    }
-
-    // プロジェクトを作成
-    const [project] = await db
-      .insert(nftProjects)
-      .values({
-        name,
-        collectionAddress,
-        chainId,
-        description,
-        category,
-        royaltyPct,
-        ownerId,
-        metadataCID,
-      })
-      .returning()
-
-    return NextResponse.json(project)
-  } catch (error: any) {
-    console.error("Failed to create project:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
