@@ -66,36 +66,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
-
-// プロジェクト作成API
-export async function POST(req: NextRequest) {
-  try {
-    const { name, collectionAddress, chainId, description, category, royaltyPct, ownerId, metadataCID } =
-      await req.json()
-
-    // 必須項目のバリデーション
-    if (!name || !collectionAddress || !chainId || !description || !category || !ownerId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
-    }
-
-    // プロジェクトを作成
-    const [project] = await db
-      .insert(nftProjects)
-      .values({
-        name,
-        collectionAddress,
-        chainId,
-        description,
-        category,
-        royaltyPct,
-        ownerId,
-        metadataCID,
-      })
-      .returning()
-
-    return NextResponse.json(project)
-  } catch (error: any) {
-    console.error("Failed to create project:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-}

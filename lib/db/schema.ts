@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm"
-import { pgTable, text, timestamp, boolean, uuid, doublePrecision } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, boolean, uuid, doublePrecision, integer, numeric } from "drizzle-orm/pg-core"
+import { ProjectStatus } from "./enums"
 
 // ユーザーテーブル
 export const users = pgTable("users", {
@@ -29,12 +30,14 @@ export const nftProjects = pgTable("nft_projects", {
   collectionAddress: text("collection_address").notNull(),
   chainId: text("chain_id").notNull(),
   description: text("description").notNull(),
-  category: text("category").notNull(), // enum: Art, PFP, Game, Music, Utility...
+  category: text("category", { enum: ["Art", "PFP", "Game", "Music", "Utility"] }).notNull(),
   royaltyPct: doublePrecision("royalty_pct"), // プロジェクトのスマートコントラクトに設定されているロイヤリティ率
   ltmRevenueUSD: doublePrecision("ltm_revenue_usd"), // 直近12か月の収益総額（USD換算）
   ownerId: uuid("owner_id").references(() => users.id),
   metadataCID: text("metadata_cid"), // IPFS/ArweaveのCID
+  status: text("status", { enum: ["draft", "active", "sold", "deleted"] }).notNull().default(ProjectStatus.DRAFT),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // 出品リストテーブル

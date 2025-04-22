@@ -71,7 +71,7 @@ export default function RootLayout({
                   </li>
                   <li>
                     <Link
-                      href="/register"
+                      href="/user/projects/new"
                       className="text-gray-500 hover:text-gray-900"
                     >
                       Register Project
@@ -79,7 +79,7 @@ export default function RootLayout({
                   </li>
                   <li>
                     <Link
-                      href="/dashboard"
+                      href="/user/dashboard"
                       className="text-gray-500 hover:text-gray-900"
                     >
                       My Dashboard
