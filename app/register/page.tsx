@@ -4,6 +4,8 @@ import type React from "react";
 
 import { AlertCircle, ArrowRight, Upload } from "lucide-react";
 import { useState } from "react";
+import { parseUnits } from "viem";
+import { useAccount, useWalletClient } from "wagmi";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import {
@@ -24,6 +26,8 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
+import { escrowContractABI } from "../../constants/abis";
+import { escrowContractAddress } from "../../constants/contracts";
 
 export default function RegisterProjectPage() {
   const [step, setStep] = useState(1);
@@ -31,6 +35,14 @@ export default function RegisterProjectPage() {
   const [contractAddress, setContractAddress] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [price, setPrice] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  // Wagmi フックを使用してウォレットクライアントとアカウント情報を取得
+  const { data: walletClient } = useWalletClient();
+  const { address } = useAccount();
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -42,17 +54,28 @@ export default function RegisterProjectPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
+    if (!walletClient || !address) {
+      setError("ウォレットが接続されていません");
+      setSubmitting(false);
+      return;
+    }
 
     try {
+      // コレクションアドレスの設定（contractAddressを使用）
+      const collectionAddress = contractAddress;
+
       // 価格をUSDCの小数点に変換（6桁）
       const priceInUSDC = parseUnits(price, 6);
 
       // トランザクションの準備と署名
       const hash = await walletClient.writeContract({
-        address: escrowContractAddress,
+        address: escrowContractAddress as `0x${string}`,
         abi: escrowContractABI,
         functionName: "registerSale",
-        args: [collectionAddress, priceInUSDC],
+        args: [collectionAddress as `0x${string}`, priceInUSDC],
       });
 
       // バックエンドに登録情報を保存（オプション）
@@ -63,11 +86,21 @@ export default function RegisterProjectPage() {
           transactionHash: hash,
           collectionAddress,
           price,
-          sellerAddress: primaryWallet.address,
+          sellerAddress: address,
         }),
       });
+
+      setSuccess(true);
+      setStep(3); // 成功後に確認ステップに移動
     } catch (error) {
       console.error("登録エラー:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "登録処理中にエラーが発生しました"
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -141,6 +174,24 @@ export default function RegisterProjectPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert className="mb-4 bg-red-50 border-red-200">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-600">
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {success && step === 3 && (
+            <Alert className="mb-4 bg-green-50 border-green-200">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-600">
+                プロジェクトが正常に登録されました！トランザクションの完了をお待ちください。
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="space-y-4">
@@ -225,7 +276,13 @@ export default function RegisterProjectPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="price">Desired Sale Price (USDC)</Label>
-                  <Input id="price" type="number" placeholder="e.g., 10000" />
+                  <Input
+                    id="price"
+                    type="number"
+                    placeholder="e.g., 10000"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
                   <p className="text-xs text-gray-500">
                     * Can be adjusted after AI valuation
                   </p>
@@ -286,8 +343,9 @@ export default function RegisterProjectPage() {
             <Button
               className="bg-rose-500 hover:bg-rose-600"
               onClick={handleSubmit}
+              disabled={submitting}
             >
-              Complete Registration
+              {submitting ? "Submitting..." : "Complete Registration"}
             </Button>
           )}
         </CardFooter>
