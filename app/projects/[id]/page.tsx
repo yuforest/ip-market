@@ -1,17 +1,17 @@
 import { eq } from "drizzle-orm";
 import { ExternalLink, Share2 } from "lucide-react";
 import { notFound } from "next/navigation";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
-import { Card, CardContent } from "../../../components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "../../../components/ui/tabs";
-import { db } from "../../../lib/db";
-import { nftProjects } from "../../../lib/db/schema";
+} from "@/components/ui/tabs";
+import { db } from "@/lib/db";
+import { nftProjects } from "@/lib/db/schema";
 
 export default async function ProjectDetailPage({
   params,
@@ -52,7 +52,7 @@ export default async function ProjectDetailPage({
               src={
                 project.metadataCID
                   ? `https://ipfs.io/ipfs/${project.metadataCID}`
-                  : "/placeholder.svg"
+                  : "https://placehold.co/600x400"
               }
               alt={project.name}
               className="object-cover w-full h-full"

@@ -15,11 +15,12 @@ import {
   TabsTrigger,
 } from "../../../components/ui/tabs";
 
-export default function ProjectReportPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function ProjectReportPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   // Sample project data
   const project = {
     id: params.id,

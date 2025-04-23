@@ -4,7 +4,8 @@ import { db } from "../../../../lib/db"
 import { listings } from "../../../../lib/db/schema"
 
 // 出品詳細取得API
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const listingId = params.id
 
@@ -45,7 +46,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // 出品更新API
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const listingId = params.id
     const { priceUSDC, escrowAddress } = await req.json()
@@ -72,7 +74,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // 出品削除API
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const listingId = params.id
 
