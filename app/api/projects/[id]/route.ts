@@ -4,7 +4,8 @@ import { db } from "../../../../lib/db"
 import { listings, nftProjects } from "../../../../lib/db/schema"
 
 // プロジェクト詳細取得API
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const projectId = params.id
 

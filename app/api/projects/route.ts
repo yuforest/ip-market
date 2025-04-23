@@ -1,7 +1,8 @@
 import { and, eq, like, or, sql } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
-import { db } from "../../../lib/db"
-import { listings, nftProjects } from "../../../lib/db/schema"
+import { db } from "@/lib/db"
+import { nftProjects } from "@/lib/db/schema"
+import { ProjectStatus } from "@/lib/db/enums"
 
 // プロジェクト一覧取得API
 export async function GET(req: NextRequest) {
@@ -9,7 +10,6 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url)
     const search = url.searchParams.get("search") || ""
     const category = url.searchParams.get("category")
-    const ownerId = url.searchParams.get("ownerId")
     const limit = Number.parseInt(url.searchParams.get("limit") || "10")
     const offset = Number.parseInt(url.searchParams.get("offset") || "0")
 
@@ -21,12 +21,16 @@ export async function GET(req: NextRequest) {
     }
 
     if (category) {
-      conditions.push(eq(nftProjects.category, category as any))
+      const categories = category.split(",").filter(Boolean)
+      if (categories.length === 1) {
+        conditions.push(eq(nftProjects.category, categories[0] as any))
+      } else if (categories.length > 1) {
+        const categoryConditions = categories.map(cat => eq(nftProjects.category, cat as any))
+        conditions.push(or(...categoryConditions))
+      }
     }
 
-    if (ownerId) {
-      conditions.push(eq(nftProjects.ownerId, ownerId))
-    }
+    conditions.push(eq(nftProjects.status, ProjectStatus.ACTIVE))
 
     // プロジェクト一覧を取得
     const projects = await db.query.nftProjects.findMany({
@@ -38,7 +42,6 @@ export async function GET(req: NextRequest) {
           limit: 1,
         },
         listings: {
-          where: eq(listings.status, "active"),
           limit: 1,
         },
       },
@@ -55,14 +58,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       projects,
-      pagination: {
-        total: Number(count),
-        limit,
-        offset,
-      },
+      count: count[0].count,
     })
-  } catch (error: any) {
-    console.error("Failed to get projects:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    console.error("Error fetching projects:", error)
+    return NextResponse.json(
+      { error: "Failed to fetch projects" },
+      { status: 500 }
+    )
   }
 }

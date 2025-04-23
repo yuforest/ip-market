@@ -5,10 +5,8 @@ import { eq } from "drizzle-orm"
 import { auth } from "@/auth"
 import { ProjectStatus } from "@/lib/db/enums"
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { ProjectForm } from "@/components/project-form";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { ProjectStatus } from "@/lib/db/enums";
 
-export default function EditProjectPage({ params }: { params: { id: string } }) {
+export default function EditProjectPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const router = useRouter();
   const [initialData, setInitialData] = useState<any>(null);
 

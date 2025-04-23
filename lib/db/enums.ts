@@ -15,4 +15,4 @@ export const ProjectCategory = {
   UTILITY: "Utility",
 } as const;
 
-export type ProjectCategory = typeof ProjectCategory[keyof typeof ProjectCategory]; 
+export type ProjectCategory = typeof ProjectCategory[keyof typeof ProjectCategory];
