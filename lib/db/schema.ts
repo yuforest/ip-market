@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { pgTable, text, timestamp, boolean, uuid, doublePrecision, integer, numeric } from "drizzle-orm/pg-core"
+import { doublePrecision, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { ProjectStatus } from "./enums"
 
 // ユーザーテーブル
@@ -46,10 +46,6 @@ export const listings = pgTable("listings", {
   projectId: uuid("project_id")
     .references(() => nftProjects.id, { onDelete: "cascade" })
     .notNull(),
-  sellerWalletId: uuid("seller_wallet_id")
-    .references(() => wallets.id)
-    .notNull(),
-  status: text("status").notNull(), // enum: draft, pending, active, sold, cancelled
   priceUSDC: doublePrecision("price_usdc").notNull(),
   escrowAddress: text("escrow_address"),
   listedAt: timestamp("listed_at").defaultNow().notNull(),
@@ -107,7 +103,6 @@ export const walletsRelations = relations(wallets, ({ many, one }) => ({
     fields: [wallets.userId],
     references: [users.id],
   }),
-  sellerListings: many(listings, { relationName: "sellerWallet" }),
   buyerTransactions: many(transactions, { relationName: "buyerWallet" }),
 }))
 
@@ -125,11 +120,6 @@ export const listingsRelations = relations(listings, ({ many, one }) => ({
   project: one(nftProjects, {
     fields: [listings.projectId],
     references: [nftProjects.id],
-  }),
-  sellerWallet: one(wallets, {
-    fields: [listings.sellerWalletId],
-    references: [wallets.id],
-    relationName: "sellerWallet",
   }),
   transaction: one(transactions),
 }))

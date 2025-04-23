@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
+import { ProjectList } from "@/components/user/project-list";
 import { db } from "@/lib/db";
-import { nftProjects, listings } from "@/lib/db/schema";
+import { ProjectStatus } from "@/lib/db/enums";
+import { nftProjects } from "@/lib/db/schema";
 import { and, eq, ne } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { ProjectList } from "@/components/user/project-list";
-import { ProjectStatus } from "@/lib/db/enums";
 
 // モックデータ
 const purchasedProjects = [
@@ -26,15 +26,14 @@ export default async function DashboardPage() {
   }
 
   const projects = await db.query.nftProjects.findMany({
-    where: and(eq(nftProjects.ownerId, session.user.id),ne(nftProjects.status, ProjectStatus.DELETED)),
+    where: and(
+      eq(nftProjects.ownerId, session.user.id),
+      ne(nftProjects.status, ProjectStatus.DELETED)
+    ),
     with: {
       owner: true,
       valuationReports: {
         orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
-        limit: 1,
-      },
-      listings: {
-        where: eq(listings.status, "active"),
         limit: 1,
       },
     },

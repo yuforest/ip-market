@@ -22,11 +22,6 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
             disclosures: true,
           },
         },
-        sellerWallet: {
-          with: {
-            user: true,
-          },
-        },
         transaction: {
           with: {
             buyerWallet: {
@@ -55,13 +50,12 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
   const params = await props.params;
   try {
     const listingId = params.id
-    const { status, priceUSDC, escrowAddress } = await req.json()
+    const { priceUSDC, escrowAddress } = await req.json()
 
     // 出品を更新
     const [updatedListing] = await db
       .update(listings)
       .set({
-        status,
         priceUSDC,
         escrowAddress,
       })
