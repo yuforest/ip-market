@@ -2,10 +2,6 @@
 
 import type React from "react";
 
-import { AlertCircle, ArrowRight, Upload } from "lucide-react";
-import { useState } from "react";
-import { parseUnits } from "viem";
-import { useAccount, useWalletClient } from "wagmi";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +24,35 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { escrowContractABI } from "@/constants/abis";
 import { escrowContractAddress } from "@/constants/contracts";
+import { AlertCircle, ArrowRight, Upload } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { parseUnits } from "viem";
+import { useAccount, useWalletClient } from "wagmi";
+
+// ERC721のABIのみを定義
+const erc721Abi = [
+  {
+    name: "setApprovalForAll",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "operator", type: "address" },
+      { name: "approved", type: "bool" },
+    ],
+    outputs: [],
+  },
+  {
+    name: "isApprovedForAll",
+    type: "function",
+    stateMutability: "view",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "operator", type: "address" },
+    ],
+    outputs: [{ name: "", type: "bool" }],
+  },
+];
 
 export default function RegisterProjectPage() {
   const [step, setStep] = useState(1);
@@ -39,10 +64,38 @@ export default function RegisterProjectPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [listingId, setListingId] = useState<string | null>(null);
+
+  // URLパラメータからプロジェクトIDを取得
+  const params = useParams();
+  const projectId = params?.id as string;
+  const router = useRouter();
 
   // Wagmi フックを使用してウォレットクライアントとアカウント情報を取得
   const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
+
+  // プロジェクトの既存リスティングを取得
+  useEffect(() => {
+    const fetchListingData = async () => {
+      if (!projectId) return;
+
+      try {
+        // プロジェクトのリスティング情報を取得
+        const response = await fetch(`/api/listings?projectId=${projectId}`);
+        const data = await response.json();
+
+        // リスティングが存在する場合、そのIDを保存
+        if (data.listings && data.listings.length > 0) {
+          setListingId(data.listings[0].id);
+        }
+      } catch (err) {
+        console.error("リスティング情報の取得に失敗:", err);
+      }
+    };
+
+    fetchListingData();
+  }, [projectId]);
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -63,35 +116,88 @@ export default function RegisterProjectPage() {
       return;
     }
 
+    console.log("price", price);
+    console.log("contractAddress", contractAddress);
+
     try {
       // コレクションアドレスの設定（contractAddressを使用）
-      const collectionAddress = contractAddress;
+      const collectionAddress = contractAddress as `0x${string}`;
 
       // 価格をUSDCの小数点に変換（6桁）
       const priceInUSDC = parseUnits(price, 6);
+      console.log("priceInUSDC", priceInUSDC);
 
-      // トランザクションの準備と署名
-      const hash = await walletClient.writeContract({
+      // ステップ1: コレクションに対するERC721 approvalForAllを設定
+      try {
+        const approvalTx = await walletClient.writeContract({
+          address: collectionAddress,
+          abi: erc721Abi,
+          functionName: "setApprovalForAll",
+          args: [escrowContractAddress as `0x${string}`, true],
+        });
+
+        // 承認トランザクションの完了を待つ
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      } catch (approvalError) {
+        console.error("ERC721承認エラー:", approvalError);
+        setError(
+          approvalError instanceof Error
+            ? approvalError.message
+            : "ERC721承認エラー"
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      console.log("承認が完了しました。リスティングを開始します。");
+
+      // ステップ2: 承認完了後にregisterSaleを実行
+      await walletClient.writeContract({
         address: escrowContractAddress as `0x${string}`,
         abi: escrowContractABI,
         functionName: "registerSale",
-        args: [collectionAddress as `0x${string}`, priceInUSDC],
+        args: [collectionAddress, priceInUSDC],
       });
+      // バックエンドにリスティング情報を保存
+      if (listingId) {
+        // 既存のリスティングを更新
+        await fetch(`/api/listings/${listingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "active",
+            priceUSDC: parseFloat(price),
+            escrowAddress: escrowContractAddress,
+          }),
+        });
+      } else {
+        await fetch(`/api/listings`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectId,
+            status: "active",
+            priceUSDC: parseFloat(price),
+            escrowAddress: escrowContractAddress,
+          }),
+        });
+      }
 
-      // バックエンドに登録情報を保存（オプション）
-      await fetch("/api/record-collection-listing", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          transactionHash: hash,
-          collectionAddress,
-          price,
-          sellerAddress: address,
-        }),
-      });
+      // プロジェクトのステータスをactiveに更新
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "active",
+          }),
+        }
+      );
 
       setSuccess(true);
-      setStep(3); // 成功後に確認ステップに移動
+      // ダッシュボード画面に遷移
+      router.push("/user/dashboard");
     } catch (error) {
       console.error("登録エラー:", error);
       setError(

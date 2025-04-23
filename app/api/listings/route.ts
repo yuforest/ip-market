@@ -8,8 +8,6 @@ export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
     const projectId = url.searchParams.get("projectId")
-    const sellerWalletId = url.searchParams.get("sellerWalletId")
-    const status = url.searchParams.get("status")
     const limit = Number.parseInt(url.searchParams.get("limit") || "10")
     const offset = Number.parseInt(url.searchParams.get("offset") || "0")
 
@@ -20,24 +18,11 @@ export async function GET(req: NextRequest) {
       conditions.push(eq(listings.projectId, projectId))
     }
 
-    if (sellerWalletId) {
-      conditions.push(eq(listings.sellerWalletId, sellerWalletId))
-    }
-
-    if (status) {
-      conditions.push(eq(listings.status, status))
-    }
-
     // 出品一覧を取得
     const listingsResult = await db.query.listings.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       with: {
         project: true,
-        sellerWallet: {
-          with: {
-            user: true,
-          },
-        },
         transaction: true,
       },
       limit,
@@ -68,10 +53,12 @@ export async function GET(req: NextRequest) {
 // 出品作成API
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, sellerWalletId, priceUSDC, escrowAddress } = await req.json()
-
+    const { projectId, priceUSDC, escrowAddress } = await req.json()
+    console.log(projectId)
+    console.log(priceUSDC)
+    console.log(escrowAddress)
     // 必須項目のバリデーション
-    if (!projectId || !sellerWalletId || !priceUSDC) {
+    if (!projectId || !priceUSDC) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
@@ -80,8 +67,6 @@ export async function POST(req: NextRequest) {
       .insert(listings)
       .values({
         projectId,
-        sellerWalletId,
-        status: "active", // デフォルトはアクティブ
         priceUSDC,
         escrowAddress,
       })

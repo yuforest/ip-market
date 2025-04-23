@@ -14,65 +14,24 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { Slider } from "../../components/ui/slider";
+import { db } from "../../lib/db";
+import { eq } from "drizzle-orm";
+import { nftProjects } from "../../lib/db/schema";
+import { ProjectStatus } from "../../lib/db/enums";
 
-export default function MarketplacePage() {
-  // Sample projects
-  const projects = [
-    {
-      id: "1",
-      name: "CryptoKitties Japan",
-      image: "https://placeholder.pics/svg/500",
-      price: "15,000 USDC",
-      category: "Art",
-      holders: 1200,
-      volume: "120 ETH",
+export default async function MarketplacePage() {
+  // DBからactiveなプロジェクトを取得
+  const projects = await db.query.nftProjects.findMany({
+    where: eq(nftProjects.status, ProjectStatus.ACTIVE),
+    with: {
+      listings: true,
+      valuationReports: {
+        orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+        limit: 1,
+      },
     },
-    {
-      id: "2",
-      name: "Manga Heroes",
-      image: "https://placeholder.pics/svg/500",
-      price: "25,000 USDC",
-      category: "Entertainment",
-      holders: 3500,
-      volume: "350 ETH",
-    },
-    {
-      id: "3",
-      name: "Tokyo Punks",
-      image: "https://placeholder.pics/svg/500",
-      price: "18,000 USDC",
-      category: "Collectibles",
-      holders: 2200,
-      volume: "180 ETH",
-    },
-    {
-      id: "4",
-      name: "Anime Avatars",
-      image: "https://placeholder.pics/svg/500",
-      price: "12,000 USDC",
-      category: "Avatars",
-      holders: 1800,
-      volume: "95 ETH",
-    },
-    {
-      id: "5",
-      name: "Crypto Samurai",
-      image: "https://placeholder.pics/svg/500",
-      price: "30,000 USDC",
-      category: "Gaming",
-      holders: 4200,
-      volume: "420 ETH",
-    },
-    {
-      id: "6",
-      name: "Digital Landscapes",
-      image: "https://placeholder.pics/svg/500",
-      price: "8,500 USDC",
-      category: "Art",
-      holders: 950,
-      volume: "65 ETH",
-    },
-  ];
+    orderBy: (projects, { desc }) => [desc(projects.createdAt)],
+  });
 
   return (
     <div className="container px-4 py-8 md:px-6 md:py-12">
@@ -181,7 +140,7 @@ export default function MarketplacePage() {
                 <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
                   <div className="aspect-square relative overflow-hidden">
                     <img
-                      src={project.image || "/placeholder.svg"}
+                      src={project.metadataCID ? `https://ipfs.io/ipfs/${project.metadataCID}` : "/placeholder.svg"}
                       alt={project.name}
                       className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                     />
@@ -196,18 +155,30 @@ export default function MarketplacePage() {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-rose-500">
-                          {project.price}
+                          {project.listings && project.listings.length > 0 
+                            ? `${project.listings[0].priceUSDC} USDC` 
+                            : "Not for sale"}
                         </p>
                       </div>
                     </div>
+                    <div className="mt-2 flex justify-between text-sm text-muted-foreground">
+                      <div>Collection: {project.collectionAddress.slice(0, 6)}...{project.collectionAddress.slice(-4)}</div>
+                    </div>
                   </CardContent>
-                  <CardFooter className="p-4 pt-0 flex justify-between text-sm text-gray-500">
-                    <span>Holders: {project.holders}</span>
-                    <span>Volume: {project.volume}</span>
+                  <CardFooter className="p-4 pt-0 flex justify-between text-sm">
+                    <span>Chain: {project.chainId}</span>
+                    <Button variant="outline" size="sm">
+                      View Details
+                    </Button>
                   </CardFooter>
                 </Card>
               </Link>
             ))}
+            {projects.length === 0 && (
+              <div className="col-span-full text-center py-10">
+                <p className="text-muted-foreground">現在、アクティブなプロジェクトはありません。</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

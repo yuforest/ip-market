@@ -36,6 +36,20 @@
       "when": 1745339579355,
       "tag": "0004_freezing_ulik",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745418499085,
+      "tag": "0005_worried_cobalt_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1745419997691,
+      "tag": "0006_narrow_screwball",
+      "breakpoints": true
     }
   ]
 }
