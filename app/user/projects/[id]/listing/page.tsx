@@ -52,6 +52,15 @@ const erc721Abi = [
     ],
     outputs: [{ name: "", type: "bool" }],
   },
+  {
+    name: "transferOwnership",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "newOwner", type: "address" }
+    ],
+    outputs: [],
+  }
 ];
 
 export default function RegisterProjectPage() {
@@ -129,27 +138,27 @@ export default function RegisterProjectPage() {
 
       // ステップ1: コレクションに対するERC721 approvalForAllを設定
       try {
-        const approvalTx = await walletClient.writeContract({
+        const ownershipTx = await walletClient.writeContract({
           address: collectionAddress,
           abi: erc721Abi,
-          functionName: "setApprovalForAll",
-          args: [escrowContractAddress as `0x${string}`, true],
+          functionName: "transferOwnership",
+          args: [escrowContractAddress as `0x${string}`],
         });
 
-        // 承認トランザクションの完了を待つ
+        // 所有権移転トランザクションの完了を待つ
         await new Promise((resolve) => setTimeout(resolve, 5000));
-      } catch (approvalError) {
-        console.error("ERC721承認エラー:", approvalError);
+      } catch (ownershipError) {
+        console.error("所有権移転エラー:", ownershipError);
         setError(
-          approvalError instanceof Error
-            ? approvalError.message
-            : "ERC721承認エラー"
+          ownershipError instanceof Error
+            ? ownershipError.message
+            : "コレクションの所有権移転に失敗しました"
         );
         setSubmitting(false);
         return;
       }
 
-      console.log("承認が完了しました。リスティングを開始します。");
+      console.log("所有権移転が完了しました。リスティングを開始します。");
 
       // ステップ2: 承認完了後にregisterSaleを実行
       await walletClient.writeContract({

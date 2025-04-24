@@ -3,7 +3,6 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
@@ -80,32 +79,6 @@ contract Escrow is Ownable, ReentrancyGuard {
     ) external returns (uint256) {
         require(collectionAddress != address(0), "Invalid collection address");
         require(price > 0, "Price must be greater than zero");
-
-        // コレクションの所有権検証
-        Ownable collection = Ownable(collectionAddress);
-        require(
-            collection.owner() == msg.sender,
-            "Caller is not the owner of the collection"
-        );
-
-        // コレクションがエスクローコントラクトに対して承認されているか確認
-        // IERC721の場合
-        try IERC721(collectionAddress).isApprovedForAll(msg.sender, address(this)) returns (bool approved) {
-            if (!approved) {
-                // 承認されていない場合はエラー
-                revert("Collection not approved for escrow contract");
-            }
-        } catch {
-            // IERC1155の場合も確認
-            try IERC1155(collectionAddress).isApprovedForAll(msg.sender, address(this)) returns (bool approved) {
-                if (!approved) {
-                    revert("Collection not approved for escrow contract");
-                }
-            } catch {
-                // どちらのインターフェースもサポートしていない場合
-                revert("Collection does not support required interface");
-            }
-        }
 
         uint256 saleId = _nextSaleId++;
         _sales[saleId] = Sale({
