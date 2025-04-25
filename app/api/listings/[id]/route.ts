@@ -24,11 +24,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         },
         transaction: {
           with: {
-            buyerWallet: {
-              with: {
-                user: true,
-              },
-            },
+            user: true,
           },
         },
       },
