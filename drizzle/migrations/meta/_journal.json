@@ -50,6 +50,20 @@
       "when": 1745419997691,
       "tag": "0006_narrow_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1745568529327,
+      "tag": "0007_material_kid_colt",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1745568655756,
+      "tag": "0008_clear_legion",
+      "breakpoints": true
     }
   ]
 }

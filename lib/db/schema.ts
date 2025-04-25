@@ -6,19 +6,9 @@ import { ProjectStatus } from "./enums"
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   sub: text("sub").notNull().unique(), // Dynamic IDを保存
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-})
-
-// ウォレットテーブル
-export const wallets = pgTable("wallets", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  address: text("address").notNull(),
-  chain: text("chain").notNull(),
-  dynamicId: text("dynamic_id").notNull().unique(),
-  userId: uuid("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
-    .notNull(),
+  address: text("address").notNull().default(""),
+  chain: text("chain").notNull().default(""),
+  dynamicWalletId: text("dynamic_wallet_id").notNull().default("").unique(), // WalletのIDを保存
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
@@ -57,8 +47,8 @@ export const transactions = pgTable("transactions", {
   listingId: uuid("listing_id")
     .references(() => listings.id, { onDelete: "cascade" })
     .notNull(),
-  buyerWalletId: uuid("buyer_wallet_id")
-    .references(() => wallets.id)
+  userId: uuid("user_id")
+    .references(() => users.id)
     .notNull(),
   priceUSDC: doublePrecision("price_usdc").notNull(),
   executedAt: timestamp("executed_at").defaultNow().notNull(),
@@ -94,16 +84,7 @@ export const projectDisclosures = pgTable("project_disclosures", {
 
 // リレーション定義
 export const usersRelations = relations(users, ({ many, one }) => ({
-  wallets: many(wallets),
   nftProjects: many(nftProjects),
-}))
-
-export const walletsRelations = relations(wallets, ({ many, one }) => ({
-  user: one(users, {
-    fields: [wallets.userId],
-    references: [users.id],
-  }),
-  buyerTransactions: many(transactions, { relationName: "buyerWallet" }),
 }))
 
 export const nftProjectsRelations = relations(nftProjects, ({ many, one }) => ({
@@ -129,10 +110,10 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
     fields: [transactions.listingId],
     references: [listings.id],
   }),
-  buyerWallet: one(wallets, {
-    fields: [transactions.buyerWalletId],
-    references: [wallets.id],
-    relationName: "buyerWallet",
+  user: one(users, {
+    fields: [transactions.userId],
+    references: [users.id],
+    relationName: "user",
   }),
 }))
 
