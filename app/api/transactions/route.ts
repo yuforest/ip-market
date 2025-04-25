@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
-import { db } from "../../../lib/db"
-import { listings, transactions } from "../../../lib/db/schema"
+import { db } from "@/lib/db"
+import { listings, transactions } from "@/lib/db/schema"
 
 // 取引作成API
 export async function POST(req: NextRequest) {
