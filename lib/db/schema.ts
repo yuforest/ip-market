@@ -36,6 +36,7 @@ export const listings = pgTable("listings", {
   projectId: uuid("project_id")
     .references(() => nftProjects.id, { onDelete: "cascade" })
     .notNull(),
+  saleId: doublePrecision("sale_id"),
   priceUSDC: doublePrecision("price_usdc").notNull(),
   escrowAddress: text("escrow_address"),
   listedAt: timestamp("listed_at").defaultNow().notNull(),

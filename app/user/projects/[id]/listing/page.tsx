@@ -27,8 +27,14 @@ import { escrowContractAddress } from "@/constants/contracts";
 import { AlertCircle, ArrowRight, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { parseUnits } from "viem";
-import { useAccount, useWalletClient } from "wagmi";
+import { http, parseUnits } from "viem";
+import { soneiumMinato } from "viem/chains";
+import {
+  createConfig,
+  useAccount,
+  usePublicClient,
+  useWalletClient,
+} from "wagmi";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -56,11 +62,9 @@ const erc721Abi = [
     name: "transferOwnership",
     type: "function",
     stateMutability: "nonpayable",
-    inputs: [
-      { name: "newOwner", type: "address" }
-    ],
+    inputs: [{ name: "newOwner", type: "address" }],
     outputs: [],
-  }
+  },
 ];
 
 export default function RegisterProjectPage() {
@@ -83,7 +87,13 @@ export default function RegisterProjectPage() {
   // Wagmi フックを使用してウォレットクライアントとアカウント情報を取得
   const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
-
+  const config = createConfig({
+    chains: [soneiumMinato],
+    transports: {
+      [soneiumMinato.id]: http(),
+    },
+  });
+  const publicClient = usePublicClient({ config });
   // プロジェクトの既存リスティングを取得
   useEffect(() => {
     const fetchListingData = async () => {
@@ -91,12 +101,13 @@ export default function RegisterProjectPage() {
 
       try {
         // プロジェクトのリスティング情報を取得
-        const response = await fetch(`/api/listings?projectId=${projectId}`);
+        const response = await fetch(`/api/listings/${projectId}`);
         const data = await response.json();
 
-        // リスティングが存在する場合、そのIDを保存
-        if (data.listings && data.listings.length > 0) {
-          setListingId(data.listings[0].id);
+        if (response.status == 200) {
+          console.log("リスティング情報:", response.status);
+          console.log("リスティング情報:", data);
+          setListingId(data.id);
         }
       } catch (err) {
         console.error("リスティング情報の取得に失敗:", err);
@@ -136,9 +147,9 @@ export default function RegisterProjectPage() {
       const priceInUSDC = parseUnits(price, 6);
       console.log("priceInUSDC", priceInUSDC);
 
-      // ステップ1: コレクションに対するERC721 approvalForAllを設定
+      // ステップ1: コレクションに対するtransferOwnershipを設定
       try {
-        const ownershipTx = await walletClient.writeContract({
+        await walletClient.writeContract({
           address: collectionAddress,
           abi: erc721Abi,
           functionName: "transferOwnership",
@@ -167,6 +178,13 @@ export default function RegisterProjectPage() {
         functionName: "registerSale",
         args: [collectionAddress, priceInUSDC],
       });
+
+      const saleId = await publicClient.readContract({
+        address: escrowContractAddress as `0x${string}`,
+        abi: escrowContractABI,
+        functionName: "getSaleId",
+      });
+      console.log("Sale ID:", saleId);
       // バックエンドにリスティング情報を保存
       if (listingId) {
         // 既存のリスティングを更新
@@ -175,6 +193,7 @@ export default function RegisterProjectPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             status: "active",
+            saleId: Number(saleId),
             priceUSDC: parseFloat(price),
             escrowAddress: escrowContractAddress,
           }),
@@ -186,6 +205,7 @@ export default function RegisterProjectPage() {
           body: JSON.stringify({
             projectId,
             status: "active",
+            saleId: Number(saleId),
             priceUSDC: parseFloat(price),
             escrowAddress: escrowContractAddress,
           }),

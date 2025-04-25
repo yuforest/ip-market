@@ -1,0 +1,1 @@
+ALTER TABLE "listings" ADD COLUMN "sale_id" double precision;

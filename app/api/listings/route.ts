@@ -1,11 +1,11 @@
-import { type NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { listings } from "@/lib/db/schema"
+import { type NextRequest, NextResponse } from "next/server"
 
 // 出品作成API
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, priceUSDC, escrowAddress } = await req.json()
+    const { projectId, priceUSDC, saleId, escrowAddress } = await req.json()
     console.log(projectId)
     console.log(priceUSDC)
     console.log(escrowAddress)
@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       .values({
         projectId,
         priceUSDC,
+        saleId,
         escrowAddress,
       })
       .returning()

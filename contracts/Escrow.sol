@@ -189,4 +189,8 @@ contract Escrow is Ownable, ReentrancyGuard {
             sale.seller
         );
     }
+
+    function getSaleId() external view returns (uint256) {
+        return _nextSaleId;
+    }
 }

@@ -1,17 +1,13 @@
-import { eq } from "drizzle-orm";
-import { ExternalLink, Share2 } from "lucide-react";
-import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/lib/db";
 import { nftProjects } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { ExternalLink } from "lucide-react";
+import { notFound } from "next/navigation";
+import BuyNowButton from "./buy-now-button";
 
 export default async function ProjectDetailPage({
   params,
@@ -41,6 +37,12 @@ export default async function ProjectDetailPage({
     project.listings && project.listings.length > 0
       ? `${project.listings[0].priceUSDC} USDC`
       : "Not for sale";
+
+  // リスティング情報を取得
+  const listing =
+    project.listings && project.listings.length > 0
+      ? project.listings[0]
+      : null;
 
   return (
     <div className="container px-4 py-8 md:px-6 md:py-12">
@@ -114,15 +116,16 @@ export default async function ProjectDetailPage({
                   <p className="text-sm text-gray-500">Current Price</p>
                   <p className="text-3xl font-bold text-rose-500">{price}</p>
                 </div>
-                <Button className="w-full">Buy Now</Button>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1">
-                    Make Offer
+                {listing && listing.saleId ? (
+                  <BuyNowButton
+                    saleId={listing.saleId}
+                    price={project.listings[0].priceUSDC}
+                  />
+                ) : (
+                  <Button className="w-full" disabled>
+                    Not for sale
                   </Button>
-                  <Button size="icon" variant="outline">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
