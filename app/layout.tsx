@@ -2,10 +2,10 @@ import { Bell } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import { Suspense } from "react";
-import { MainNav } from "../components/main-nav";
-import { Button } from "../components/ui/button";
+import { MainNav } from "@/components/main-nav";
+import { Button } from "@/components/ui/button";
 import "./globals.css";
-import Providers from "../components/providers";
+import Providers from "@/components/providers";
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 export default function RootLayout({
   children,

@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
-import { db } from "../../../../lib/db"
-import { listings, nftProjects } from "../../../../lib/db/schema"
+import { db } from "@/lib/db"
+import { nftProjects } from "@/lib/db/schema"
 
 // プロジェクト詳細取得API
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {

@@ -1,4 +1,4 @@
-import { and, eq, like, or, sql, ne } from "drizzle-orm"
+import { and, eq, ne } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
