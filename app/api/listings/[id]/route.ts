@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
-import { db } from "../../../../lib/db"
-import { listings } from "../../../../lib/db/schema"
+import { db } from "@/lib/db"
+import { listings } from "@/lib/db/schema"
 
 // 出品詳細取得API
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -24,11 +24,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         },
         transaction: {
           with: {
-            buyerWallet: {
-              with: {
-                user: true,
-              },
-            },
+            user: true,
           },
         },
       },

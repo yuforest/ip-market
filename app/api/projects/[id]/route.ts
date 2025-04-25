@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
-import { db } from "../../../../lib/db"
-import { listings, nftProjects } from "../../../../lib/db/schema"
+import { db } from "@/lib/db"
+import { nftProjects } from "@/lib/db/schema"
 
 // プロジェクト詳細取得API
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -11,16 +11,10 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // プロジェクト詳細を取得
     const project = await db.query.nftProjects.findFirst({
-      where: eq(nftProjects.id, projectId),
+      where: and(eq(nftProjects.id, projectId), eq(nftProjects.status, "active")),
       with: {
-        owner: {
-          with: {
-            wallets: true,
-          },
-        },
-        listings: {
-          where: eq(listings.status, "active"),
-        },
+        owner: true,
+        listings: true,
         valuationReports: {
           orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
           limit: 1,

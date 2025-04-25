@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
-import { db } from "../../../lib/db"
-import { valuationReports } from "../../../lib/db/schema"
+import { db } from "@/lib/db"
+import { valuationReports } from "@/lib/db/schema"
 
 // 価値評価レポート作成API
 export async function POST(req: NextRequest) {

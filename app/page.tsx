@@ -1,8 +1,8 @@
 import { ArrowRight, RefreshCw, Shield, Sparkles } from "lucide-react";
 import Link from "next/link";
-import FeaturedProjects from "../components/featured-projects";
-import HowItWorks from "../components/how-it-works";
-import { Button } from "../components/ui/button";
+import FeaturedProjects from "@/components/featured-projects";
+import HowItWorks from "@/components/how-it-works";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
