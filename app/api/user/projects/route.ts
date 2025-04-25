@@ -16,7 +16,7 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
     // クエリ条件を構築
     const conditions = [
       ne(nftProjects.status, ProjectStatus.DELETED),
-      eq(nftProjects.ownerId, req.auth.user.id)
+      eq(nftProjects.ownerId, req.auth.user.id),
     ]
 
     // プロジェクト一覧を取得
@@ -29,7 +29,6 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
           limit: 1,
         },
         listings: {
-          where: eq(listings.status, "active"),
           limit: 1,
         },
       },
