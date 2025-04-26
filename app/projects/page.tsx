@@ -51,7 +51,7 @@ type Project = NftProject & {
 export default async function ProjectsPage({
   searchParams,
 }: ProjectsPageProps) {
-  const { search, category } = searchParams;
+  const { search, category } = await searchParams;
 
   const res = await getProjects({ search, category });
   const projects = res.projects as Project[];

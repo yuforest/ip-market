@@ -14,9 +14,10 @@ export default async function ProjectDetailPage({
 }: {
   params: { id: string };
 }) {
+  const { id } = await params;
   // データベースからプロジェクト情報を取得
   const project = await db.query.nftProjects.findFirst({
-    where: eq(nftProjects.id, params.id),
+    where: eq(nftProjects.id, id),
     with: {
       owner: true,
       listings: true,
