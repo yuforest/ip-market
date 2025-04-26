@@ -39,6 +39,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               iconUrls: ["https://soneium.org/favicon.ico"],
               blockExplorerUrls: [soneiumMinato.blockExplorers.default.url],
             },
+
           ],
         },
         events: {
