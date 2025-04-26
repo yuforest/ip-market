@@ -6,7 +6,7 @@ import { listings, nftProjects, transactions } from "@/lib/db/schema"
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string, txHash: string } }
+  { params }: { params: { projectId: string, txHash: string } }
 ) {
   try {
     // 認証チェック
@@ -16,7 +16,7 @@ export async function POST(
     }
 
     const userId = session.user.id
-    const projectId = params.id
+    const projectId = params.projectId
     const txHash = params.txHash
     const project = await db.query.nftProjects.findFirst({
       where: eq(nftProjects.id, projectId),
