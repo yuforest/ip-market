@@ -1,8 +1,11 @@
 import { auth } from "./auth"
 
 export default auth((req) => {
+  // ログインが必要なページを定義
+  const isProtectedPage = req.nextUrl.pathname.startsWith(`/user`)
+
   // ログインしていない場合、トップ以外のページにアクセスした時はトップページにリダイレクト
-  if (!req.auth && req.nextUrl.pathname !== "/") {
+  if (!req.auth && isProtectedPage) {
     const newUrl = new URL("/", req.nextUrl.origin)
     return Response.redirect(newUrl)
   }
