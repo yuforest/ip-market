@@ -12,9 +12,9 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@dynamic-labs/ethereum": "^4.12.4",
-    "@dynamic-labs/sdk-react-core": "^4.12.4",
-    "@dynamic-labs/wagmi-connector": "^4.12.4",
+    "@dynamic-labs/ethereum": "^4.14.0",
+    "@dynamic-labs/sdk-react-core": "^4.14.0",
+    "@dynamic-labs/wagmi-connector": "^4.14.0",
     "@neondatabase/serverless": "^1.0.0",
     "@radix-ui/react-accordion": "^1.2.7",
     "@radix-ui/react-checkbox": "^1.2.2",
