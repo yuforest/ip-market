@@ -1,0 +1,1 @@
+ALTER TABLE "listings" ALTER COLUMN "sale_id" SET DATA TYPE integer;

@@ -45,7 +45,7 @@ interface ProjectsPageProps {
 }
 
 type Project = NftProject & {
-  listings: Listing[];
+  listing: Listing;
 };
 
 export default async function ProjectsPage({
@@ -91,8 +91,8 @@ export default async function ProjectsPage({
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-rose-500">
-                        {project.listings && project.listings.length > 0
-                          ? `${project.listings[0].priceUSDC} USDC`
+                        {project.listing
+                          ? `${project.listing.priceUSDC} USDC`
                           : "Not for sale"}
                       </p>
                     </div>

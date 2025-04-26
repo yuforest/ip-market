@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       where: and(eq(nftProjects.id, projectId), eq(nftProjects.status, "active")),
       with: {
         owner: true,
-        listings: true,
+        listing: true,
         valuationReports: {
           orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
           limit: 1,
