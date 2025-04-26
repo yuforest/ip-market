@@ -20,7 +20,7 @@ export default async function ProjectDetailPage({
     where: eq(nftProjects.id, id),
     with: {
       owner: true,
-      listings: true,
+      listing: true,
       valuationReports: {
         orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
         limit: 1,
@@ -35,14 +35,14 @@ export default async function ProjectDetailPage({
 
   // リスティング情報から価格を取得
   const price =
-    project.listings && project.listings.length > 0
-      ? `${project.listings[0].priceUSDC} USDC`
+    project.listing
+      ? `${project.listing.priceUSDC} USDC`
       : "Not for sale";
 
   // リスティング情報を取得
   const listing =
-    project.listings && project.listings.length > 0
-      ? project.listings[0]
+    project.listing
+      ? project.listing
       : null;
 
   return (
@@ -120,7 +120,7 @@ export default async function ProjectDetailPage({
                 {listing && listing.saleId ? (
                   <BuyNowButton
                     saleId={listing.saleId}
-                    price={project.listings[0].priceUSDC}
+                    price={listing.priceUSDC}
                   />
                 ) : (
                   <Button className="w-full" disabled>

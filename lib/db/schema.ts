@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { doublePrecision, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { doublePrecision, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { ProjectStatus } from "./enums"
 
 // ユーザーテーブル
@@ -36,7 +36,7 @@ export const listings = pgTable("listings", {
   projectId: uuid("project_id")
     .references(() => nftProjects.id, { onDelete: "cascade" })
     .notNull(),
-  saleId: doublePrecision("sale_id"),
+  saleId: integer("sale_id"),
   priceUSDC: doublePrecision("price_usdc").notNull(),
   escrowAddress: text("escrow_address"),
   listedAt: timestamp("listed_at").defaultNow().notNull(),
@@ -52,8 +52,9 @@ export const transactions = pgTable("transactions", {
     .references(() => users.id)
     .notNull(),
   priceUSDC: doublePrecision("price_usdc").notNull(),
-  executedAt: timestamp("executed_at").defaultNow().notNull(),
   txHash: text("tx_hash").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // 価値評価レポートテーブル
@@ -93,7 +94,7 @@ export const nftProjectsRelations = relations(nftProjects, ({ many, one }) => ({
     fields: [nftProjects.ownerId],
     references: [users.id],
   }),
-  listings: many(listings),
+  listing: one(listings),
   valuationReports: many(valuationReports),
   disclosures: many(projectDisclosures),
 }))

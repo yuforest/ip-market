@@ -41,9 +41,7 @@ export async function GET(req: NextRequest) {
           orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
           limit: 1,
         },
-        listings: {
-          limit: 1,
-        },
+        listing: true,
       },
       orderBy: (projects, { desc }) => [desc(projects.createdAt)],
       limit,
