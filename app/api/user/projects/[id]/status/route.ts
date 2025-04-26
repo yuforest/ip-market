@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { nftProjects } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 import { auth } from "@/auth"
 import { ProjectStatus } from "@/lib/db/enums"
 
@@ -22,7 +22,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     const [project] = await db
       .select()
       .from(nftProjects)
-      .where(eq(nftProjects.id, params.id))
+      .where(and(eq(nftProjects.id, params.id), eq(nftProjects.status, ProjectStatus.ACTIVE)))
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })

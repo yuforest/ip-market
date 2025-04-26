@@ -26,17 +26,8 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
         ne(nftProjects.status, ProjectStatus.DELETED)
       ),
       with: {
-        owner: {
-          with: {
-            wallets: true,
-          },
-        },
-        listings: {
-          where: eq(listings.status, "active"),
-          with: {
-            sellerWallet: true,
-          },
-        },
+        owner: true,
+        listings: true,
         valuationReports: {
           orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
           limit: 1,
