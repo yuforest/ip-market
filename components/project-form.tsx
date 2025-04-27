@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertCircle, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 type ProjectFormData = {
   name: string;
@@ -45,7 +45,11 @@ type ProjectFormProps = {
   isEditing?: boolean;
 };
 
-export function ProjectForm({ initialData, onSubmit, isEditing = false }: ProjectFormProps) {
+export function ProjectForm({
+  initialData,
+  onSubmit,
+  isEditing = false,
+}: ProjectFormProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<ProjectFormData>(
     initialData || {
@@ -110,8 +114,9 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
       <Alert className="mb-6">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          To {isEditing ? "update" : "register"} a project, you must be the owner of the smart
-          contract. Ownership verification will be performed after wallet connection.
+          To {isEditing ? "update" : "register"} a project, you must be the
+          owner of the smart contract. Ownership verification will be performed
+          after wallet connection.
         </AlertDescription>
       </Alert>
 
@@ -173,12 +178,17 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="collectionAddress">Collection Address *</Label>
+                  <Label htmlFor="collectionAddress">
+                    Collection Address *
+                  </Label>
                   <Input
                     id="collectionAddress"
                     value={formData.collectionAddress}
                     onChange={(e) =>
-                      setFormData({ ...formData, collectionAddress: e.target.value })
+                      setFormData({
+                        ...formData,
+                        collectionAddress: e.target.value,
+                      })
                     }
                     required
                   />
@@ -195,9 +205,7 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
                       <SelectValue placeholder="Select a chain" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Ethereum Mainnet</SelectItem>
-                      <SelectItem value="137">Polygon</SelectItem>
-                      <SelectItem value="42161">Arbitrum</SelectItem>
+                      <SelectItem value="1868">Soneium Minato</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -250,7 +258,10 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
                     type="number"
                     value={formData.ltmRevenueUSD}
                     onChange={(e) =>
-                      setFormData({ ...formData, ltmRevenueUSD: e.target.value })
+                      setFormData({
+                        ...formData,
+                        ltmRevenueUSD: e.target.value,
+                      })
                     }
                   />
                 </div>
@@ -278,7 +289,10 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
                         onValueChange={(value) => {
                           const newDisclosures = [...formData.disclosures];
                           newDisclosures[index].disclosureType = value;
-                          setFormData({ ...formData, disclosures: newDisclosures });
+                          setFormData({
+                            ...formData,
+                            disclosures: newDisclosures,
+                          });
                         }}
                       >
                         <SelectTrigger>
@@ -299,7 +313,10 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
                         onChange={(e) => {
                           const newDisclosures = [...formData.disclosures];
                           newDisclosures[index].title = e.target.value;
-                          setFormData({ ...formData, disclosures: newDisclosures });
+                          setFormData({
+                            ...formData,
+                            disclosures: newDisclosures,
+                          });
                         }}
                       />
                     </div>
@@ -310,7 +327,10 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
                         onChange={(e) => {
                           const newDisclosures = [...formData.disclosures];
                           newDisclosures[index].description = e.target.value;
-                          setFormData({ ...formData, disclosures: newDisclosures });
+                          setFormData({
+                            ...formData,
+                            disclosures: newDisclosures,
+                          });
                         }}
                       />
                     </div>
@@ -345,4 +365,4 @@ export function ProjectForm({ initialData, onSubmit, isEditing = false }: Projec
       </Card>
     </div>
   );
-} 
+}
