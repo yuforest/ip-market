@@ -1,12 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import type { ProjectFormData } from "@/components/project-form";
 import { ProjectForm } from "@/components/project-form";
+import { useRouter } from "next/navigation";
 
 export default function RegisterProjectPage() {
   const router = useRouter();
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: ProjectFormData) => {
     try {
       const response = await fetch("/api/user/projects", {
         method: "POST",

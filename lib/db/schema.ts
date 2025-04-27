@@ -17,6 +17,7 @@ export const users = pgTable("users", {
 export const nftProjects = pgTable("nft_projects", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
+  image: text("image"),
   collectionAddress: text("collection_address").notNull(),
   chainId: text("chain_id").notNull(),
   description: text("description").notNull(),

@@ -20,14 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { AlertCircle, ArrowRight, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
 
-type ProjectFormData = {
+export type ProjectFormData = {
   name: string;
   collectionAddress: string;
   chainId: string;
   description: string;
+  image?: string;
   category: string;
   royaltyPct: string;
   ltmRevenueUSD: string;
@@ -56,6 +57,7 @@ export function ProjectForm({
       name: "",
       collectionAddress: "",
       chainId: "",
+      image: "",
       description: "",
       category: "",
       royaltyPct: "",
@@ -70,6 +72,13 @@ export function ProjectForm({
       ],
     }
   );
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialData?.image) {
+      setImagePreview(initialData.image);
+    }
+  }, [initialData]);
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -96,6 +105,25 @@ export function ProjectForm({
         },
       ],
     }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        if (event.target && typeof event.target.result === "string") {
+          setImagePreview(event.target.result);
+          setFormData({
+            ...formData,
+            image: event.target.result,
+          });
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -176,6 +204,37 @@ export function ProjectForm({
                     }
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="projectImage">Project Image</Label>
+                  <div className="mt-1 flex items-center">
+                    <label
+                      htmlFor="file-upload"
+                      className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    >
+                      <Upload className="h-4 w-4 mr-2 inline-block" />
+                      <span>アップロード</span>
+                      <Input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </label>
+                  </div>
+                  {imagePreview && (
+                    <div className="mt-2">
+                      <div className="relative w-24 h-24 overflow-hidden rounded-md">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="collectionAddress">

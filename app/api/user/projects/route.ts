@@ -1,10 +1,10 @@
-import { and, eq, ne } from "drizzle-orm"
-import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
-import { listings, nftProjects, projectDisclosures } from "@/lib/db/schema"
 import { ProjectStatus } from "@/lib/db/enums"
+import { nftProjects, projectDisclosures } from "@/lib/db/schema"
+import { and, eq, ne } from "drizzle-orm"
 import type { NextAuthRequest } from "next-auth"
+import { NextResponse } from "next/server"
 
 // プロジェクト一覧取得API
 export const GET = auth(async function GET(req: NextAuthRequest) {
@@ -34,9 +34,9 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
     })
 
     return NextResponse.json({ projects })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to get projects:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 })
 
@@ -58,6 +58,7 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
       ltmRevenueUSD,
       metadataCID,
       disclosures,
+      image,
     } = body
 
     // 必須フィールドのバリデーション
@@ -77,6 +78,7 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
         royaltyPct: royaltyPct || null,
         ltmRevenueUSD: ltmRevenueUSD || null,
         metadataCID: metadataCID || null,
+        image: image || null,
         ownerId: req.auth.user.id,
         status: ProjectStatus.DRAFT,
       })
@@ -84,7 +86,13 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
 
     // 開示情報の作成（存在する場合）
     if (disclosures && disclosures.length > 0) {
-      const disclosureValues = disclosures.map((disclosure: any) => ({
+      interface Disclosure {
+        disclosureType: string
+        title: string
+        description: string
+      }
+      
+      const disclosureValues = disclosures.map((disclosure: Disclosure) => ({
         projectId: project.id,
         disclosureType: disclosure.disclosureType,
         title: disclosure.title,
@@ -95,8 +103,8 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
     }
 
     return NextResponse.json(project)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create project:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 })

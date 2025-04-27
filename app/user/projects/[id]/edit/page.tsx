@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
 import { ProjectForm } from "@/components/project-form";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
-import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { ProjectStatus } from "@/lib/db/enums";
+import { Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export default function EditProjectPage(props: { params: Promise<{ id: string }> }) {
+export default function EditProjectPage(props: {
+  params: Promise<{ id: string }>;
+}) {
   const params = use(props.params);
   const router = useRouter();
   const [initialData, setInitialData] = useState<any>(null);
@@ -55,29 +57,30 @@ export default function EditProjectPage(props: { params: Promise<{ id: string }>
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this project?')) return;
+    if (!confirm("Are you sure you want to delete this project?")) return;
 
     try {
       const response = await fetch(`/api/user/projects/${params.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
-      if (!response.ok) throw new Error('Failed to delete project');
+      if (!response.ok) throw new Error("Failed to delete project");
 
-      toast.success('Project deleted successfully');
-      router.push('/user/dashboard');
+      toast.success("Project deleted successfully");
+      router.push("/user/dashboard");
     } catch (error) {
-      console.error('Error deleting project:', error);
-      toast.error('Failed to delete project');
+      console.error("Error deleting project:", error);
+      toast.error("Failed to delete project");
     }
   };
 
   const handleVisibilityToggle = async () => {
     if (!initialData) return;
 
-    const newStatus = initialData.status === ProjectStatus.ACTIVE
-      ? ProjectStatus.DRAFT
-      : ProjectStatus.ACTIVE;
+    const newStatus =
+      initialData.status === ProjectStatus.ACTIVE
+        ? ProjectStatus.DRAFT
+        : ProjectStatus.ACTIVE;
 
     try {
       const response = await fetch(`/api/user/projects/${params.id}/status`, {
@@ -90,13 +93,17 @@ export default function EditProjectPage(props: { params: Promise<{ id: string }>
 
       if (response.ok) {
         setInitialData({ ...initialData, status: newStatus });
-        toast.success(`Project ${newStatus === ProjectStatus.ACTIVE ? 'published' : 'unpublished'} successfully`);
+        toast.success(
+          `Project ${
+            newStatus === ProjectStatus.ACTIVE ? "published" : "unpublished"
+          } successfully`
+        );
       } else {
-        throw new Error('Failed to update project status');
+        throw new Error("Failed to update project status");
       }
     } catch (error) {
-      console.error('Error updating project status:', error);
-      toast.error('Failed to update project status');
+      console.error("Error updating project status:", error);
+      toast.error("Failed to update project status");
     }
   };
 
@@ -115,7 +122,9 @@ export default function EditProjectPage(props: { params: Promise<{ id: string }>
               onCheckedChange={handleVisibilityToggle}
             />
             <span className="text-sm">
-              {initialData.status === ProjectStatus.ACTIVE ? 'Published' : 'Draft'}
+              {initialData.status === ProjectStatus.ACTIVE
+                ? "Published"
+                : "Draft"}
             </span>
           </div>
           <Button
@@ -128,7 +137,11 @@ export default function EditProjectPage(props: { params: Promise<{ id: string }>
           </Button>
         </div>
       </div>
-      <ProjectForm initialData={initialData} onSubmit={handleSubmit} isEditing />
+      <ProjectForm
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        isEditing
+      />
     </div>
   );
 }
