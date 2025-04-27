@@ -1,38 +1,21 @@
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardFooter } from "./ui/card";
+import { nftProjects } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { ProjectStatus } from "@/lib/db/enums";
+import { Button } from "./ui/button";
 
-export default function FeaturedProjects() {
-  // Sample projects
-  const projects = [
-    {
-      id: "1",
-      name: "CryptoKitties Japan",
-      image: "https://placeholder.pics/svg/500",
-      price: "15,000 USDC",
-      category: "Art",
-      holders: 1200,
-      volume: "120 ETH",
+export default async function FeaturedProjects() {
+
+  const projects = await db.query.nftProjects.findMany({
+    where: eq(nftProjects.status, ProjectStatus.ACTIVE),
+    limit: 3,
+    with: {
+      listing: true,
     },
-    {
-      id: "2",
-      name: "Manga Heroes",
-      image: "https://placeholder.pics/svg/500",
-      price: "25,000 USDC",
-      category: "Entertainment",
-      holders: 3500,
-      volume: "350 ETH",
-    },
-    {
-      id: "3",
-      name: "Tokyo Punks",
-      image: "https://placeholder.pics/svg/500",
-      price: "18,000 USDC",
-      category: "Collectibles",
-      holders: 2200,
-      volume: "180 ETH",
-    },
-  ];
+  })
 
   return (
     <section className="py-12 md:py-16 bg-gray-50">
@@ -55,33 +38,49 @@ export default function FeaturedProjects() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <Link href={`/projects/${project.id}`} key={project.id}>
-              <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
-                <div className="aspect-square relative overflow-hidden">
-                  <img
-                    src={project.image || "/placeholder.svg"}
-                    alt={project.name}
-                    className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
+            <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
+              <div className="aspect-square relative overflow-hidden">
+                <img
+                  src={
+                    project.metadataCID
+                      ? `https://ipfs.io/ipfs/${project.metadataCID}`
+                      : "https://placehold.co/600x400"
+                  }
+                  alt={project.name}
+                  className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-lg">{project.name}</h3>
+                    <Badge variant="outline" className="mt-1">
+                      {project.category}
+                    </Badge>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-rose-500">
+                      {project.listing
+                        ? `${project.listing.priceUSDC} USDC`
+                        : "Not for sale"}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex justify-between text-sm text-muted-foreground">
                     <div>
-                      <h3 className="font-bold text-lg">{project.name}</h3>
-                      <Badge variant="outline" className="mt-1">
-                        {project.category}
-                      </Badge>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-rose-500">{project.price}</p>
+                      Collection: {project.collectionAddress.slice(0, 6)}...
+                      {project.collectionAddress.slice(-4)}
                     </div>
                   </div>
-                </CardContent>
-                <CardFooter className="p-4 pt-0 flex justify-between text-sm text-gray-500">
-                  <span>Holders: {project.holders}</span>
-                  <span>Volume: {project.volume}</span>
-                </CardFooter>
-              </Card>
-            </Link>
+                </div>
+              </CardContent>
+              <CardFooter className="p-4 pt-0 flex justify-between text-sm text-gray-500">
+                <span>Chain: {project.chainId}</span>
+                <Button variant="outline" size="sm">
+                  View Details
+                </Button>
+              </CardFooter>
+            </Card>
+          </Link>
           ))}
         </div>
       </div>
