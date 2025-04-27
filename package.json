@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "ngrok": "source .env && ngrok http 3000 --domain=$NGROK_DOMAIN"
   },
   "dependencies": {
     "@dynamic-labs/ethereum": "^4.14.0",
