@@ -58,18 +58,22 @@ export async function ProjectList({ projects }: ProjectListProps) {
                       View
                     </Link>
                   </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/user/projects/${project.id}/edit`}>
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/user/projects/${project.id}/listing`}>
-                      <Edit className="h-4 w-4 mr-1" />
-                      Listing
-                    </Link>
-                  </Button>
+                  {(project.status === ProjectStatus.ACTIVE || project.status === ProjectStatus.DRAFT) && (
+                    <>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/user/projects/${project.id}/edit`}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/user/projects/${project.id}/listing`}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Listing
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

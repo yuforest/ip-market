@@ -47,7 +47,7 @@ export default function EditProjectPage(props: {
       });
 
       if (response.ok) {
-        router.push("/user/projects");
+        router.push("/user/dashboard");
       } else {
         console.error("Failed to update project");
       }
