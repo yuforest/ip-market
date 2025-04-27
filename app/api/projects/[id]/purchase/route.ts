@@ -1,12 +1,12 @@
-import { eq } from "drizzle-orm"
-import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { listings, nftProjects, transactions } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
+import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { projectId: string, txHash: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
     // 認証チェック
@@ -15,9 +15,11 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const params = await props.params
     const userId = session.user.id
-    const projectId = params.projectId
-    const txHash = params.txHash
+    const projectId = params.id
+    const { txHash } = await req.json()
+    
     const project = await db.query.nftProjects.findFirst({
       where: eq(nftProjects.id, projectId),
     })
@@ -58,8 +60,10 @@ export async function POST(
     })
 
     return NextResponse.json(result)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create transaction:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : "Unknown error" 
+    }, { status: 500 })
   }
 }

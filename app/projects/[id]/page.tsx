@@ -34,16 +34,12 @@ export default async function ProjectDetailPage({
   }
 
   // リスティング情報から価格を取得
-  const price =
-    project.listing
-      ? `${project.listing.priceUSDC} USDC`
-      : "Not for sale";
+  const price = project.listing
+    ? `${project.listing.priceUSDC} USDC`
+    : "Not for sale";
 
   // リスティング情報を取得
-  const listing =
-    project.listing
-      ? project.listing
-      : null;
+  const listing = project.listing ? project.listing : null;
 
   return (
     <div className="container px-4 py-8 md:px-6 md:py-12">
@@ -117,8 +113,9 @@ export default async function ProjectDetailPage({
                   <p className="text-sm text-gray-500">Current Price</p>
                   <p className="text-3xl font-bold text-rose-500">{price}</p>
                 </div>
-                {listing && listing.saleId ? (
+                {listing && listing.saleId && project.status == "active" ? (
                   <BuyNowButton
+                    projectId={project.id}
                     saleId={listing.saleId}
                     price={listing.priceUSDC}
                   />
