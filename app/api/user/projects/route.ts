@@ -25,7 +25,7 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
       with: {
         owner: true,
         valuationReports: {
-          orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+          orderBy: (reports, { desc }) => [desc(reports.createdAt)],
           limit: 1,
         },
         listing: true,

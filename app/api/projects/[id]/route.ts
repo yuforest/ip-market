@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         owner: true,
         listing: true,
         valuationReports: {
-          orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+          orderBy: (reports, { desc }) => [desc(reports.createdAt)],
           limit: 1,
         },
         disclosures: true,
@@ -35,42 +35,42 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 }
 
 // プロジェクト更新API
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const projectId = params.id
-    const body = await req.json()
+// export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+//   try {
+//     const projectId = params.id
+//     const body = await req.json()
 
-    // 更新データのバリデーション
-    const { name, description, category, status, royaltyPct, ltmRevenueUSD, metadataCID } = body
+//     // 更新データのバリデーション
+//     const { name, description, category, status, royaltyPct, ltmRevenueUSD, metadataCID } = body
 
-    // プロジェクトの存在確認
-    const existingProject = await db.query.nftProjects.findFirst({
-      where: eq(nftProjects.id, projectId),
-    })
+//     // プロジェクトの存在確認
+//     const existingProject = await db.query.nftProjects.findFirst({
+//       where: eq(nftProjects.id, projectId),
+//     })
 
-    if (!existingProject) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 })
-    }
+//     if (!existingProject) {
+//       return NextResponse.json({ error: "Project not found" }, { status: 404 })
+//     }
 
-    // プロジェクト更新
-    const updatedProject = await db
-      .update(nftProjects)
-      .set({
-        ...(name && { name }),
-        ...(description && { description }),
-        ...(category && { category }),
-        ...(status && { status }),
-        ...(royaltyPct !== undefined && { royaltyPct }),
-        ...(ltmRevenueUSD !== undefined && { ltmRevenueUSD }),
-        ...(metadataCID && { metadataCID }),
-        updatedAt: new Date(),
-      })
-      .where(eq(nftProjects.id, projectId))
-      .returning()
+//     // プロジェクト更新
+//     const updatedProject = await db
+//       .update(nftProjects)
+//       .set({
+//         ...(name && { name }),
+//         ...(description && { description }),
+//         ...(category && { category }),
+//         ...(status && { status }),
+//         ...(royaltyPct !== undefined && { royaltyPct }),
+//         ...(ltmRevenueUSD !== undefined && { ltmRevenueUSD }),
+//         ...(metadataCID && { metadataCID }),
+//         updatedAt: new Date(),
+//       })
+//       .where(eq(nftProjects.id, projectId))
+//       .returning()
 
-    return NextResponse.json(updatedProject[0])
-  } catch (error: unknown) {
-    console.error("Failed to update project:", error)
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 })
-  }
-}
+//     return NextResponse.json(updatedProject[0])
+//   } catch (error: unknown) {
+//     console.error("Failed to update project:", error)
+//     return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 })
+//   }
+// }

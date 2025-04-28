@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     with: {
       owner: true,
       valuationReports: {
-        orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+        orderBy: (reports, { desc }) => [desc(reports.createdAt)],
         limit: 1,
       },
     },
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
                 <h3 className="font-semibold">{project.name}</h3>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                   <span>Category: {project.category}</span>
-                  <span>Purchased: {project.transaction.createdAt.toLocaleString()}</span>
+                  <span>Purchased: {project.transaction?.createdAt.toLocaleString()}</span>
                 </div>
               </div>
               <div className="text-right">

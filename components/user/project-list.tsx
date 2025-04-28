@@ -1,3 +1,7 @@
+"use client"
+
+import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -5,12 +9,39 @@ import { Badge } from "@/components/ui/badge"
 import { Eye, Edit } from "lucide-react"
 import { ProjectStatus } from "@/lib/db/enums"
 import type { NftProject } from "@/lib/db/schema"
+import { useState } from "react"
 
 interface ProjectListProps {
   projects: NftProject[]
 }
 
-export async function ProjectList({ projects }: ProjectListProps) {
+export function ProjectList({ projects }: ProjectListProps) {
+  const [loading, setLoading] = useState<{ [key: string]: boolean }>({})
+
+  const generateValuation = async (projectId: string) => {
+    try {
+      setLoading((prev) => ({ ...prev, [projectId]: true }))
+      const response = await fetch(`/api/user/projects/${projectId}/valuation`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectId,
+        }),
+      })
+      if (!response.ok) {
+        throw new Error("Failed to generate valuation")
+      }
+      const data = await response.json()
+      toast.success("Valuation report generated successfully")
+    } catch (error) {
+      toast.error("Failed to generate valuation report")
+    } finally {
+      setLoading((prev) => ({ ...prev, [projectId]: false }))
+    }
+  }
+
   if (projects.length === 0) {
     return (
       <Card>
@@ -65,6 +96,19 @@ export async function ProjectList({ projects }: ProjectListProps) {
                           <Edit className="h-4 w-4 mr-1" />
                           Edit
                         </Link>
+                      </Button>
+                      <Button
+                        onClick={() => generateValuation(project.id)}
+                        disabled={loading[project.id]}
+                      >
+                        {loading[project.id] ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          "Generate Valuation"
+                        )}
                       </Button>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/user/projects/${project.id}/listing`}>

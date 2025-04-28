@@ -22,7 +22,7 @@ export default async function ProjectDetailPage({
       owner: true,
       listing: true,
       valuationReports: {
-        orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+        orderBy: (reports, { desc }) => [desc(reports.createdAt)],
         limit: 1,
       },
     },
@@ -49,9 +49,7 @@ export default async function ProjectDetailPage({
           <div className="relative aspect-square overflow-hidden rounded-xl">
             <img
               src={
-                project.metadataCID
-                  ? `https://ipfs.io/ipfs/${project.metadataCID}`
-                  : "https://placehold.co/600x400"
+                project.image || "https://placehold.co/600x400"
               }
               alt={project.name}
               className="object-cover w-full h-full"
@@ -166,7 +164,7 @@ export default async function ProjectDetailPage({
                         <p className="text-sm text-gray-500">
                           Generated on{" "}
                           {new Date(
-                            project.valuationReports[0].generatedAt
+                            project.valuationReports[0].createdAt
                           ).toLocaleDateString("ja-JP")}
                         </p>
                         <p className="font-medium">

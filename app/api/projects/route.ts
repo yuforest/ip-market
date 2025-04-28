@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       with: {
         owner: true,
         valuationReports: {
-          orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+          orderBy: (reports, { desc }) => [desc(reports.createdAt)],
           limit: 1,
         },
         listing: true,

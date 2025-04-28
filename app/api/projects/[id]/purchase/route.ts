@@ -62,8 +62,8 @@ export async function POST(
     return NextResponse.json(result)
   } catch (error: unknown) {
     console.error("Failed to create transaction:", error)
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : "Unknown error" 
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
 }

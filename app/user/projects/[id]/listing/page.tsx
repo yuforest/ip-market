@@ -27,6 +27,7 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
+import { Listing, NftProject, ValuationReport } from "@/lib/db/schema";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -60,15 +61,18 @@ const erc721Abi = [
 ];
 
 export default function RegisterProjectPage() {
-  const [projectName, setProjectName] = useState("");
-  const [collectionAddress, setCollectionAddress] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  // const [projectName, setProjectName] = useState("");
+  // const [collectionAddress, setCollectionAddress] = useState("");
+  // const [description, setDescription] = useState("");
+  // const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [listingId, setListingId] = useState<string | null>(null);
+  // const [listingId, setListingId] = useState<string | null>(null);
+  const [project, setProject] = useState<NftProject | null>(null);
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [valuationReport, setValuationReport] = useState<ValuationReport | null>(null);
 
   // URLパラメータからプロジェクトIDを取得
   const params = useParams();
@@ -90,7 +94,7 @@ export default function RegisterProjectPage() {
     const fetchProjectData = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/projects/${projectId}`,
           {
             method: "GET",
             headers: {
@@ -102,42 +106,18 @@ export default function RegisterProjectPage() {
         console.log(data);
 
         if (response.status == 200) {
-          setProjectName(data.name);
-          setCollectionAddress(data.collectionAddress);
-          setDescription(data.description);
-          setCategory(data.category);
+          setProject(data);
+          setListing(data.listing);
+          setPrice(data.listing?.priceUSDC?.toString() || "");
+          setValuationReport(data.valuationReports[0]);
         }
+        console.log(valuationReport);
       } catch (err) {
         console.error("プロジェクト情報の取得に失敗:", err);
       }
     };
 
-    const fetchListingData = async () => {
-      if (!projectId) return;
-
-      try {
-        // プロジェクトのリスティング情報を取得
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/listings/${projectId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        if (response.status == 200) {
-          setListingId(data.id);
-        }
-      } catch (err) {
-        console.error("リスティング情報の取得に失敗:", err);
-      }
-    };
-
     fetchProjectData();
-    fetchListingData();
   }, [projectId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -151,6 +131,12 @@ export default function RegisterProjectPage() {
       return;
     }
 
+    if (!project) {
+      setError("プロジェクトが見つかりません");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       // 価格をUSDCの小数点に変換（6桁）
       const priceInUSDC = parseUnits(price, 6);
@@ -159,7 +145,7 @@ export default function RegisterProjectPage() {
       // ステップ1: コレクションに対するtransferOwnershipを設定
       try {
         await walletClient.writeContract({
-          address: collectionAddress as `0x${string}`,
+          address: project.collectionAddress as `0x${string}`,
           abi: erc721Abi,
           functionName: "transferOwnership",
           args: [escrowContractAddress as `0x${string}`],
@@ -185,7 +171,7 @@ export default function RegisterProjectPage() {
         address: escrowContractAddress as `0x${string}`,
         abi: escrowContractABI,
         functionName: "registerSale",
-        args: [collectionAddress, priceInUSDC],
+        args: [project.collectionAddress, priceInUSDC],
       });
 
       const saleId = await publicClient.readContract({
@@ -195,9 +181,9 @@ export default function RegisterProjectPage() {
       });
       console.log("Sale ID:", saleId);
       // バックエンドにリスティング情報を保存
-      if (listingId) {
+      if (listing?.id) {
         // 既存のリスティングを更新
-        await fetch(`/api/listings/${listingId}`, {
+        await fetch(`/api/user/listings/${listing.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -208,7 +194,7 @@ export default function RegisterProjectPage() {
           }),
         });
       } else {
-        await fetch(`/api/listings`, {
+        await fetch(`/api/user/listings`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -223,12 +209,13 @@ export default function RegisterProjectPage() {
 
       // プロジェクトのステータスをactiveに更新
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/projects/${projectId}/status`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             status: "active",
+            projectId: projectId,
           }),
         }
       );
@@ -247,6 +234,10 @@ export default function RegisterProjectPage() {
       setSubmitting(false);
     }
   };
+
+  if (!project) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container max-w-3xl px-4 py-8 md:px-6 md:py-12">
@@ -299,19 +290,27 @@ export default function RegisterProjectPage() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-500">Project Name</p>
-                    <p className="font-medium">{projectName}</p>
+                    <p className="font-medium">{project.name}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Category</p>
-                    <p className="font-medium">{category}</p>
+                    <p className="font-medium">{project.category}</p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Contract Address</p>
-                    <p className="font-medium font-mono">{collectionAddress}</p>
+                    <p className="font-medium font-mono">{project.collectionAddress}</p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Description</p>
-                    <p className="font-medium">{description}</p>
+                    <p className="font-medium">{project.description}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-500">Report</p>
+                    <p className="font-medium">{valuationReport?.report}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-500">Estimated Value</p>
+                    <p className="font-medium">{valuationReport?.estimatedValueUSD}</p>
                   </div>
                 </div>
               </div>
