@@ -58,6 +58,12 @@ contract Escrow is Ownable, ReentrancyGuard {
         address indexed previousOwner,
         address indexed newOwner
     );
+    event SalePriceUpdated(
+        uint256 indexed saleId,
+        uint256 oldPrice,
+        uint256 newPrice
+    );
+    event SaleCancelled(uint256 indexed saleId);
 
     /**
      * @dev コンストラクタ
@@ -165,16 +171,35 @@ contract Escrow is Ownable, ReentrancyGuard {
     }
 
     /**
+     * @dev セールの価格を更新する
+     * @param saleId 更新するセールのID
+     * @param newPrice 新しい価格（USDC）
+     */
+    function updateSalePrice(uint256 saleId, uint256 newPrice) external {
+        require(saleId < _nextSaleId, "Sale does not exist");
+        require(newPrice > 0, "Price must be greater than zero");
+
+        Sale storage sale = _sales[saleId];
+        require(sale.seller == msg.sender, "Only seller can update price");
+        require(sale.status == SaleStatus.Open, "Sale must be open");
+
+        uint256 oldPrice = sale.price;
+        sale.price = newPrice;
+
+        emit SalePriceUpdated(saleId, oldPrice, newPrice);
+    }
+
+    /**
      * @dev セールをキャンセルする
-     * @param saleId キャンセルするセールID
+     * @param saleId キャンセルするセールのID
      */
     function cancelSale(uint256 saleId) external {
-        Sale storage sale = _sales[saleId];
-        require(sale.seller != address(0), "Sale does not exist");
-        require(sale.status == SaleStatus.Open, "Sale is not open");
-        require(msg.sender == sale.seller, "Only seller can cancel");
+        require(saleId < _nextSaleId, "Sale does not exist");
 
-        // セールのステータスを更新
+        Sale storage sale = _sales[saleId];
+        require(sale.seller == msg.sender, "Only seller can cancel sale");
+        require(sale.status == SaleStatus.Open, "Sale must be open");
+
         sale.status = SaleStatus.Canceled;
 
         // コレクションの所有権を売り手に戻す

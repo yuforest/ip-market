@@ -8,15 +8,13 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
   const params = await props.params;
   try {
     const listingId = params.id
-    const { priceUSDC, saleId, escrowAddress } = await req.json()
+    const { priceUSDC } = await req.json()
 
     // 出品を更新
     const [updatedListing] = await db
       .update(listings)
       .set({
         priceUSDC,
-        saleId,
-        escrowAddress,
       })
       .where(eq(listings.id, listingId))
       .returning()

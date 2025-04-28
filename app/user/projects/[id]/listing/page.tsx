@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { escrowContractABI } from "@/constants/abis";
 import { escrowContractAddress } from "@/constants/contracts";
+import { Listing, NftProject, ValuationReport } from "@/lib/db/schema";
 import { AlertCircle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,7 +28,6 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { Listing, NftProject, ValuationReport } from "@/lib/db/schema";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -72,7 +72,8 @@ export default function RegisterProjectPage() {
   // const [listingId, setListingId] = useState<string | null>(null);
   const [project, setProject] = useState<NftProject | null>(null);
   const [listing, setListing] = useState<Listing | null>(null);
-  const [valuationReport, setValuationReport] = useState<ValuationReport | null>(null);
+  const [valuationReport, setValuationReport] =
+    useState<ValuationReport | null>(null);
 
   // URLパラメータからプロジェクトIDを取得
   const params = useParams();
@@ -142,58 +143,63 @@ export default function RegisterProjectPage() {
       const priceInUSDC = parseUnits(price, 6);
       console.log("priceInUSDC", priceInUSDC);
 
-      // ステップ1: コレクションに対するtransferOwnershipを設定
-      try {
-        await walletClient.writeContract({
-          address: project.collectionAddress as `0x${string}`,
-          abi: erc721Abi,
-          functionName: "transferOwnership",
-          args: [escrowContractAddress as `0x${string}`],
-        });
-
-        // 所有権移転トランザクションの完了を待つ
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      } catch (ownershipError) {
-        console.error("所有権移転エラー:", ownershipError);
-        setError(
-          ownershipError instanceof Error
-            ? ownershipError.message
-            : "コレクションの所有権移転に失敗しました"
-        );
-        setSubmitting(false);
-        return;
-      }
-
-      console.log("所有権移転が完了しました。リスティングを開始します。");
-
-      // ステップ2: 承認完了後にregisterSaleを実行
-      await walletClient.writeContract({
-        address: escrowContractAddress as `0x${string}`,
-        abi: escrowContractABI,
-        functionName: "registerSale",
-        args: [project.collectionAddress, priceInUSDC],
-      });
-
-      const saleId = await publicClient.readContract({
-        address: escrowContractAddress as `0x${string}`,
-        abi: escrowContractABI,
-        functionName: "getSaleId",
-      });
-      console.log("Sale ID:", saleId);
       // バックエンドにリスティング情報を保存
       if (listing?.id) {
+        await walletClient.writeContract({
+          address: escrowContractAddress as `0x${string}`,
+          abi: escrowContractABI,
+          functionName: "updateSalePrice",
+          args: [listing.saleId, priceInUSDC],
+        });
+
         // 既存のリスティングを更新
         await fetch(`/api/user/listings/${listing.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             status: "active",
-            saleId: Number(saleId),
             priceUSDC: parseFloat(price),
-            escrowAddress: escrowContractAddress,
           }),
         });
       } else {
+        // ステップ1: コレクションに対するtransferOwnershipを設定
+        try {
+          await walletClient.writeContract({
+            address: project.collectionAddress as `0x${string}`,
+            abi: erc721Abi,
+            functionName: "transferOwnership",
+            args: [escrowContractAddress as `0x${string}`],
+          });
+
+          // 所有権移転トランザクションの完了を待つ
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+        } catch (ownershipError) {
+          console.error("所有権移転エラー:", ownershipError);
+          setError(
+            ownershipError instanceof Error
+              ? ownershipError.message
+              : "コレクションの所有権移転に失敗しました"
+          );
+          setSubmitting(false);
+          return;
+        }
+
+        console.log("所有権移転が完了しました。リスティングを開始します。");
+
+        // ステップ2: 承認完了後にregisterSaleを実行
+        await walletClient.writeContract({
+          address: escrowContractAddress as `0x${string}`,
+          abi: escrowContractABI,
+          functionName: "registerSale",
+          args: [project.collectionAddress, priceInUSDC],
+        });
+
+        const saleId = await publicClient.readContract({
+          address: escrowContractAddress as `0x${string}`,
+          abi: escrowContractABI,
+          functionName: "getSaleId",
+        });
+
         await fetch(`/api/user/listings`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -298,7 +304,9 @@ export default function RegisterProjectPage() {
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Contract Address</p>
-                    <p className="font-medium font-mono">{project.collectionAddress}</p>
+                    <p className="font-medium font-mono">
+                      {project.collectionAddress}
+                    </p>
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Description</p>
@@ -310,7 +318,9 @@ export default function RegisterProjectPage() {
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Estimated Value</p>
-                    <p className="font-medium">{valuationReport?.estimatedValueUSD}</p>
+                    <p className="font-medium">
+                      {valuationReport?.estimatedValueUSD}
+                    </p>
                   </div>
                 </div>
               </div>
