@@ -88,7 +88,7 @@ export default function EditProjectPage(props: {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, projectId: params.id }),
       });
 
       if (response.ok) {

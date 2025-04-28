@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const purchasedProjects = await db.select({
     id: nftProjects.id,
     name: nftProjects.name,
-    metadataCID: nftProjects.metadataCID,
+    image: nftProjects.image,
     category: nftProjects.category,
     priceUSDC: listings.priceUSDC,
     transaction: {
@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     with: {
       owner: true,
       valuationReports: {
-        orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
+        orderBy: (reports, { desc }) => [desc(reports.createdAt)],
         limit: 1,
       },
     },
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
                 <img
-                  src={project.metadataCID || "https://placeholder.pics/svg/500"}
+                  src={project.image || "https://placeholder.pics/svg/500"}
                   alt={project.name}
                   className="h-full w-full object-cover"
                 />
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
                 <h3 className="font-semibold">{project.name}</h3>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                   <span>Category: {project.category}</span>
-                  <span>Purchased: {project.transaction.createdAt.toLocaleString()}</span>
+                  <span>Purchased: {project.transaction?.createdAt.toLocaleString()}</span>
                 </div>
               </div>
               <div className="text-right">

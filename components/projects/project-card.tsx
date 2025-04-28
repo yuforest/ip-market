@@ -15,9 +15,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         <div className="aspect-square relative overflow-hidden">
           <img
             src={
-              project.metadataCID
-                ? `https://ipfs.io/ipfs/${project.metadataCID}`
-                : "https://placehold.co/600x400"
+              project.image || "https://placehold.co/600x400"
             }
             alt={project.name}
             className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"

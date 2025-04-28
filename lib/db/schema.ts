@@ -65,11 +65,10 @@ export const valuationReports = pgTable("valuation_reports", {
     .references(() => nftProjects.id, { onDelete: "cascade" })
     .notNull(),
   estimatedValueUSD: doublePrecision("estimated_value_usd").notNull(),
-  agentId: text("agent_id").notNull(), // AIエージェントの識別子
   modelVersion: text("model_version").notNull(), // 使用されたAIモデルのバージョン
-  featuresJSON: text("features_json").notNull(), // 評価に使用された特徴量（JSON形式）
-  commentaryText: text("commentary_text").notNull(), // AIによる評価コメント
-  generatedAt: timestamp("generated_at").defaultNow().notNull(),
+  report: text("commentary_text").notNull(), // AIによる評価コメント
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // プロジェクト開示情報テーブル
@@ -138,3 +137,4 @@ export const projectDisclosuresRelations = relations(projectDisclosures, ({ one 
 export type User = typeof users.$inferSelect;
 export type NftProject = typeof nftProjects.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
+export type ValuationReport = typeof valuationReports.$inferSelect;

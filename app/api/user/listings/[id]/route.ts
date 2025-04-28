@@ -3,44 +3,6 @@ import { listings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
-// 出品詳細取得API
-export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  try {
-    const listingId = params.id
-
-    // 出品詳細を取得
-    const listing = await db.query.listings.findFirst({
-      where: eq(listings.id, listingId),
-      with: {
-        project: {
-          with: {
-            valuationReports: {
-              orderBy: (reports, { desc }) => [desc(reports.generatedAt)],
-              limit: 1,
-            },
-            disclosures: true,
-          },
-        },
-        transaction: {
-          with: {
-            user: true,
-          },
-        },
-      },
-    })
-
-    if (!listing) {
-      return NextResponse.json({ error: "Listing not found" }, { status: 404 })
-    }
-
-    return NextResponse.json(listing)
-  } catch (error: any) {
-    console.error("Failed to get listing:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-}
-
 // 出品更新API
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

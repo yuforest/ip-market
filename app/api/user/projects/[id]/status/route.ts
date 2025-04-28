@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { nftProjects } from "@/lib/db/schema"
-import { and, eq } from "drizzle-orm"
+import { and, eq, or } from "drizzle-orm"
 import { auth } from "@/auth"
 import { ProjectStatus } from "@/lib/db/enums"
 
-export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export async function PUT(request: Request) {
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
-    const { status } = await request.json()
+    const { status, projectId } = await request.json()
 
     if (!Object.values(ProjectStatus).includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 })
@@ -22,7 +21,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     const [project] = await db
       .select()
       .from(nftProjects)
-      .where(and(eq(nftProjects.id, params.id), eq(nftProjects.status, ProjectStatus.ACTIVE)))
+      .where(and(eq(nftProjects.id, projectId), or(eq(nftProjects.status, ProjectStatus.ACTIVE), eq(nftProjects.status, ProjectStatus.DRAFT))))
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
@@ -35,7 +34,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     await db
       .update(nftProjects)
       .set({ status })
-      .where(eq(nftProjects.id, params.id))
+      .where(eq(nftProjects.id, projectId))
 
     return NextResponse.json({ success: true })
   } catch (error) {
