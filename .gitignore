@@ -30,9 +30,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
 # vercel
 .vercel
 
@@ -42,6 +39,7 @@ next-env.d.ts
 
 node_modules
 .env
+.env.local
 
 # Hardhat files
 /cache
@@ -59,7 +57,6 @@ node_modules
 ignition/deployments/chain-31337
 
 node_modules
-.env
 
 # Hardhat files
 /cache
