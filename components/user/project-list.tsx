@@ -8,11 +8,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Eye, Edit } from "lucide-react"
 import { ProjectStatus } from "@/lib/db/enums"
-import type { NftProject } from "@/lib/db/schema"
+import type { NftProject, ValuationReport } from "@/lib/db/schema"
 import { useState } from "react"
 
 interface ProjectListProps {
-  projects: NftProject[]
+  projects: (NftProject & { valuationReports: ValuationReport[] })[]
 }
 
 export function ProjectList({ projects }: ProjectListProps) {
@@ -75,6 +75,11 @@ export function ProjectList({ projects }: ProjectListProps) {
                   >
                     {project.status}
                   </Badge>
+                  {project.valuationReports.length > 0 && (
+                    <Badge variant="outline">
+                      Valuated on {project.valuationReports[0].createdAt.toLocaleDateString()}
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                   <span>Category: {project.category}</span>
@@ -107,15 +112,17 @@ export function ProjectList({ projects }: ProjectListProps) {
                             Generating...
                           </>
                         ) : (
-                          "Generate Valuation"
+                          project.valuationReports.length > 0 ? "Update Valuation" : "Generate Valuation"
                         )}
                       </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/user/projects/${project.id}/listing`}>
-                          <Edit className="h-4 w-4 mr-1" />
-                          Listing
-                        </Link>
-                      </Button>
+                      {project.valuationReports.length > 0 && (
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/user/projects/${project.id}/listing`}>
+                            <Edit className="h-4 w-4 mr-1" />
+                            Listing
+                          </Link>
+                        </Button>
+                      )}
                     </>
                   )}
                 </div>

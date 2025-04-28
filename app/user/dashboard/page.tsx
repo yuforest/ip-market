@@ -54,8 +54,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-8">My Projects</h2>
-      <ProjectList projects={projects} />
+      <h2 className="text-2xl font-bold mb-2">My Projects</h2>
+      <p className="text-sm text-gray-500">You can check your projects here.</p>
+      <p className="text-sm text-gray-500">To list your project, please generate a valuation report.</p>
+      <div className="mt-2">
+        <ProjectList projects={projects} />
+      </div>
 
       <h2 className="text-2xl font-bold mt-12 mb-6">Purchase History</h2>
       <div className="space-y-4">
