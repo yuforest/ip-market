@@ -1,6 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/lib/db";
 import { nftProjects } from "@/lib/db/schema";
@@ -128,6 +133,13 @@ export default async function ProjectDetailPage({
                   </Button>
                 )}
               </div>
+              <div className="mb-4">
+                <div className="pt-6 text-sm text-gray-600">
+                  By making a purchase an escrow transaction is executed and the
+                  owner of the NFT collection is transferred to the wallet you
+                  used to log in.
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -191,7 +203,9 @@ export default async function ProjectDetailPage({
                   <Card key={disclosure.id}>
                     <CardContent className="p-6">
                       <CardTitle>{disclosure.title}</CardTitle>
-                      <CardDescription>{disclosure.description}</CardDescription>
+                      <CardDescription>
+                        {disclosure.description}
+                      </CardDescription>
                     </CardContent>
                   </Card>
                 );
@@ -208,12 +222,11 @@ export default async function ProjectDetailPage({
                   {transaction != null && (
                     <div className="text-sm">
                       <p>
-                        Date: {transaction.createdAt.toLocaleDateString("ja-JP")}
+                        Date:{" "}
+                        {transaction.createdAt.toLocaleDateString("ja-JP")}
                       </p>
                       <p>Tx Hash: {transaction.txHash}</p>
-                      <p>
-                        Price: ${transaction.priceUSDC.toLocaleString()}
-                      </p>
+                      <p>Price: ${transaction.priceUSDC.toLocaleString()}</p>
                     </div>
                   )}
                 </CardContent>

@@ -299,9 +299,6 @@ export default function RegisterProjectPage() {
     <div className="container max-w-3xl px-4 py-8 md:px-6 md:py-12">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold">List NFT Project</h1>
-        <p className="text-muted-foreground mt-2">
-          List your NFT project on the marketplace
-        </p>
       </div>
 
       <Alert className="mb-6">
@@ -309,6 +306,9 @@ export default function RegisterProjectPage() {
         <AlertDescription>
           To list a project, you must be the owner of the smart contract.
           Ownership verification will be performed after wallet connection.
+          <br />
+          When a listed NFT collection is purchased, the owner of the NFT
+          collection becomes the buyer's wallet address.
         </AlertDescription>
       </Alert>
 
