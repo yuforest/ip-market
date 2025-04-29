@@ -1,6 +1,6 @@
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
-import { listings, nftProjects, transactions } from "@/lib/db/schema"
+import { listings, nftProjects, notifications, transactions } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { type NextRequest, NextResponse } from "next/server"
 
@@ -55,6 +55,18 @@ export async function POST(
         .update(nftProjects)
         .set({ status: "sold" })
         .where(eq(nftProjects.id, projectId))
+
+      // 販売者に通知を送信
+      await tx
+        .insert(notifications)
+        .values({
+          userId: project.ownerId!,
+          type: "purchase",
+          title: "NFT Purchased",
+          message: `Your NFT project "${project.name}" has been purchased.`,
+          projectId: project.id,
+          metadata: {},
+        })
 
       return transaction
     })

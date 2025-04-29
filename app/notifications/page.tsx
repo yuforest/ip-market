@@ -1,49 +1,53 @@
-import { AlertCircle, Bell, CheckCircle, DollarSign, Eye } from "lucide-react";
-import Link from "next/link";
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatDistanceToNow } from "date-fns";
+import { AlertCircle, Bell, CheckCircle, DollarSign, Eye } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  projectId: string;
+  createdAt: string;
+}
 
 export default function NotificationsPage() {
-  // Sample notification data
-  const notifications = [
-    {
-      id: "1",
-      type: "purchase",
-      title: "Purchase Complete",
-      message: "Your purchase of Anime Avatars has been completed.",
-      date: "August 10, 2023",
-      read: false,
-      projectId: "3",
-    },
-    {
-      id: "2",
-      type: "listing",
-      title: "Listing Complete",
-      message: "CryptoKitties Japan has been successfully listed.",
-      date: "May 15, 2023",
-      read: true,
-      projectId: "1",
-    },
-    {
-      id: "3",
-      type: "report",
-      title: "Report Generated",
-      message: "Valuation report for Samurai Warriors has been generated.",
-      date: "June 21, 2023",
-      read: false,
-      projectId: "2",
-    },
-    {
-      id: "4",
-      type: "offer",
-      title: "Purchase Offer",
-      message: "You have received a purchase offer for CryptoKitties Japan.",
-      date: "July 5, 2023",
-      read: true,
-      projectId: "1",
-    },
-  ];
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/notifications`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch notifications");
+        }
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
 
   // Function to get icon based on notification type
   const getNotificationIcon = (type: string) => {
@@ -61,8 +65,18 @@ export default function NotificationsPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="container px-4 py-8 md:px-6 md:py-12">
+        <div className="flex justify-center items-center h-64">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container px-4 py-8 md:px-6 md:py-12">
+    <div className="container px-4 py-8 md:px-6 md:px-6 md:py-12">
       <div className="flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <div>
@@ -96,7 +110,9 @@ export default function NotificationsPage() {
                     </div>
                     <p className="text-gray-600 mt-1">{notification.message}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                      {notification.date}
+                      {formatDistanceToNow(new Date(notification.createdAt), {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                   <div>

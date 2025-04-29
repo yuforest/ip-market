@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { doublePrecision, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { boolean, doublePrecision, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import { ProjectStatus } from "./enums"
 
 // ユーザーテーブル
@@ -83,9 +83,30 @@ export const projectDisclosures = pgTable("project_disclosures", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
+// 通知テーブル
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .references(() => users.id)
+    .notNull(),
+  type: text("type", { 
+    enum: ["purchase"] 
+  }).notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  projectId: uuid("project_id")
+    .references(() => nftProjects.id)
+    .notNull(),
+  read: boolean("read").notNull().default(false),
+  metadata: jsonb("metadata"), // 通知の種類に応じた追加情報（例：価格、ステータス変更前後の値など）
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
 // リレーション定義
 export const usersRelations = relations(users, ({ many, one }) => ({
   nftProjects: many(nftProjects),
+  notifications: many(notifications),
 }))
 
 export const nftProjectsRelations = relations(nftProjects, ({ many, one }) => ({
@@ -96,6 +117,7 @@ export const nftProjectsRelations = relations(nftProjects, ({ many, one }) => ({
   listing: one(listings),
   valuationReports: many(valuationReports),
   disclosures: many(projectDisclosures),
+  notifications: many(notifications),
 }))
 
 export const listingsRelations = relations(listings, ({ many, one }) => ({
@@ -132,8 +154,20 @@ export const projectDisclosuresRelations = relations(projectDisclosures, ({ one 
   }),
 }))
 
+// 通知のリレーション定義
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+  project: one(nftProjects, {
+    fields: [notifications.projectId],
+    references: [nftProjects.id],
+  }),
+}))
 
 export type User = typeof users.$inferSelect;
 export type NftProject = typeof nftProjects.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
 export type ValuationReport = typeof valuationReports.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
