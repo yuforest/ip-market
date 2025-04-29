@@ -31,6 +31,7 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
+import { marked } from "marked";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -364,7 +365,13 @@ export default function RegisterProjectPage() {
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Report</p>
-                    <p className="font-medium">{valuationReport?.report}</p>
+                    <div className="prose">
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: marked(valuationReport?.report || "") as string,
+                        }}
+                      />
+                    </div>
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Estimated Value</p>

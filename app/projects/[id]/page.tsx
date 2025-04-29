@@ -13,6 +13,7 @@ import { eq } from "drizzle-orm";
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
 import BuyNowButton from "./buy-now-button";
+import { marked } from "marked";
 
 export default async function ProjectDetailPage({
   params,
@@ -189,8 +190,12 @@ export default async function ProjectDetailPage({
                             ? `$${project.valuationReports[0].estimatedValueUSD.toLocaleString()}`
                             : "N/A"}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          {project.valuationReports[0].report}
+                        <p className="text-sm text-gray-500 prose">
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: marked(project.valuationReports[0].report) as string,
+                            }}
+                          />
                         </p>
                       </div>
                     </CardContent>

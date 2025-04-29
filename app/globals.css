@@ -90,3 +90,41 @@
     @apply bg-background text-foreground;
   }
 }
+
+.prose {
+  @apply text-sm leading-6;
+  h1 {
+    @apply text-xl font-bold my-2;
+  }
+  h2 {
+    @apply text-lg font-bold my-1;
+  }
+  h3 {
+    @apply text-base font-bold my-1;
+  }
+  h4 {
+    @apply text-sm font-bold my-1;
+  }
+  p {
+    @apply text-sm leading-4;
+  }
+  ul,
+  ol {
+    @apply list-inside;
+  }
+  ul {
+    @apply list-disc;
+  }
+  ol {
+    @apply list-decimal;
+  }
+  a {
+    @apply text-blue-500;
+  }
+  img {
+    @apply w-full;
+  }
+  blockquote {
+    @apply border-l-2 border-gray-300 pl-4 py-2 my-4;
+  }
+}
