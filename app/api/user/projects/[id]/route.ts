@@ -1,10 +1,10 @@
-import { eq, and, ne } from "drizzle-orm"
-import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
-import { listings, nftProjects, projectDisclosures } from "@/lib/db/schema"
 import { ProjectStatus } from "@/lib/db/enums"
+import { nftProjects, projectDisclosures } from "@/lib/db/schema"
+import { and, eq, ne } from "drizzle-orm"
 import type { NextAuthRequest } from "next-auth"
+import { NextResponse } from "next/server"
 
 // プロジェクト詳細取得API
 export const GET = auth(async function GET(req: NextAuthRequest) {
@@ -62,6 +62,7 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
     const body = await req.json()
     const {
       name,
+      image,
       collectionAddress,
       chainId,
       description,
@@ -98,6 +99,7 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
       .update(nftProjects)
       .set({
         name,
+        image,
         collectionAddress,
         chainId,
         description,
