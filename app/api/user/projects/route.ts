@@ -8,7 +8,8 @@ import { NextResponse } from "next/server"
 
 // プロジェクト一覧取得API
 export const GET = auth(async function GET(req: NextAuthRequest) {
-  if (!req.auth?.user?.id) {
+  const session = await auth()
+  if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -16,7 +17,7 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
     // クエリ条件を構築
     const conditions = [
       ne(nftProjects.status, ProjectStatus.DELETED),
-      eq(nftProjects.ownerId, req.auth.user.id),
+      eq(nftProjects.ownerId, session?.user?.id),
     ]
 
     // プロジェクト一覧を取得

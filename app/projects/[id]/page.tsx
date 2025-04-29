@@ -55,9 +55,7 @@ export default async function ProjectDetailPage({
         <div>
           <div className="relative aspect-square overflow-hidden rounded-xl">
             <img
-              src={
-                project.image || "https://placehold.co/600x400"
-              }
+              src={project.image || "https://placehold.co/600x400"}
               alt={project.name}
               className="object-cover w-full h-full"
             />
@@ -120,7 +118,7 @@ export default async function ProjectDetailPage({
                 </div>
                 {listing && listing.saleId && project.status == "active" ? (
                   <BuyNowButton
-                    projectId={project.id}
+                    project={project}
                     saleId={listing.saleId}
                     price={listing.priceUSDC}
                   />

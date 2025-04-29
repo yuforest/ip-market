@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 
 interface BuyNowButtonProps {
-  projectId: string;
+  project: any;
   saleId: number;
   price: number;
 }
@@ -28,7 +28,7 @@ const ERC20_ABI = [
 ];
 
 export default function BuyNowButton({
-  projectId,
+  project,
   saleId,
   price,
 }: BuyNowButtonProps) {
@@ -61,7 +61,7 @@ export default function BuyNowButton({
       });
 
       // バックエンドAPIを呼び出してDBを更新
-      const response = await fetch(`/api/projects/${projectId}/purchase`, {
+      const response = await fetch(`/api/projects/${project.id}/purchase`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

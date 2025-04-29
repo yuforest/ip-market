@@ -1,46 +1,51 @@
-"use client"
+"use client";
 
-import { Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Eye, Edit } from "lucide-react"
-import { ProjectStatus } from "@/lib/db/enums"
-import type { NftProject, ValuationReport } from "@/lib/db/schema"
-import { useState } from "react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ProjectStatus } from "@/lib/db/enums";
+import type { NftProject, ValuationReport } from "@/lib/db/schema";
+import { Edit, Eye, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface ProjectListProps {
-  projects: (NftProject & { valuationReports: ValuationReport[] })[]
+  projects: (NftProject & { valuationReports: ValuationReport[] })[];
 }
 
 export function ProjectList({ projects }: ProjectListProps) {
-  const [loading, setLoading] = useState<{ [key: string]: boolean }>({})
+  const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const router = useRouter();
 
   const generateValuation = async (projectId: string) => {
     try {
-      setLoading((prev) => ({ ...prev, [projectId]: true }))
-      const response = await fetch(`/api/user/projects/${projectId}/valuation`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          projectId,
-        }),
-      })
+      setLoading((prev) => ({ ...prev, [projectId]: true }));
+      const response = await fetch(
+        `/api/user/projects/${projectId}/valuation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            projectId,
+          }),
+        }
+      );
       if (!response.ok) {
-        throw new Error("Failed to generate valuation")
+        throw new Error("Failed to generate valuation");
       }
-      const data = await response.json()
-      toast.success("Valuation report generated successfully")
+      const data = await response.json();
+      toast.success("Valuation report generated successfully");
+      router.refresh();
     } catch (error) {
-      toast.error("Failed to generate valuation report")
+      toast.error("Failed to generate valuation report");
     } finally {
-      setLoading((prev) => ({ ...prev, [projectId]: false }))
+      setLoading((prev) => ({ ...prev, [projectId]: false }));
     }
-  }
+  };
 
   if (projects.length === 0) {
     return (
@@ -54,7 +59,7 @@ export function ProjectList({ projects }: ProjectListProps) {
           </Button>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -77,13 +82,16 @@ export function ProjectList({ projects }: ProjectListProps) {
                   </Badge>
                   {project.valuationReports.length > 0 && (
                     <Badge variant="outline">
-                      Valuated on {project.valuationReports[0].createdAt.toLocaleDateString()}
+                      Valuated on{" "}
+                      {project.valuationReports[0].createdAt.toLocaleDateString()}
                     </Badge>
                   )}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                   <span>Category: {project.category}</span>
-                  <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
+                  <span>
+                    Created: {new Date(project.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
               <div className="text-right">
@@ -94,37 +102,40 @@ export function ProjectList({ projects }: ProjectListProps) {
                       View
                     </Link>
                   </Button>
-                  {(project.status !== ProjectStatus.SOLD && project.status !== ProjectStatus.DELETED) && (
-                    <>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/user/projects/${project.id}/edit`}>
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Link>
-                      </Button>
-                      <Button
-                        onClick={() => generateValuation(project.id)}
-                        disabled={loading[project.id]}
-                      >
-                        {loading[project.id] ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Generating...
-                          </>
-                        ) : (
-                          project.valuationReports.length > 0 ? "Update Valuation" : "Generate Valuation"
-                        )}
-                      </Button>
-                      {project.valuationReports.length > 0 && (
+                  {project.status !== ProjectStatus.SOLD &&
+                    project.status !== ProjectStatus.DELETED && (
+                      <>
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/user/projects/${project.id}/listing`}>
+                          <Link href={`/user/projects/${project.id}/edit`}>
                             <Edit className="h-4 w-4 mr-1" />
-                            Listing
+                            Edit
                           </Link>
                         </Button>
-                      )}
-                    </>
-                  )}
+                        <Button
+                          onClick={() => generateValuation(project.id)}
+                          disabled={loading[project.id]}
+                        >
+                          {loading[project.id] ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Generating...
+                            </>
+                          ) : project.valuationReports.length > 0 ? (
+                            "Update Valuation"
+                          ) : (
+                            "Generate Valuation"
+                          )}
+                        </Button>
+                        {project.valuationReports.length > 0 && (
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/user/projects/${project.id}/listing`}>
+                              <Edit className="h-4 w-4 mr-1" />
+                              Listing
+                            </Link>
+                          </Button>
+                        )}
+                      </>
+                    )}
                 </div>
               </div>
             </div>
@@ -132,5 +143,5 @@ export function ProjectList({ projects }: ProjectListProps) {
         </Card>
       ))}
     </div>
-  )
+  );
 }
