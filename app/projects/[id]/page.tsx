@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/lib/db";
 import { nftProjects } from "@/lib/db/schema";
@@ -20,11 +20,16 @@ export default async function ProjectDetailPage({
     where: eq(nftProjects.id, id),
     with: {
       owner: true,
-      listing: true,
+      listing: {
+        with: {
+          transaction: true,
+        },
+      },
       valuationReports: {
         orderBy: (reports, { desc }) => [desc(reports.createdAt)],
         limit: 1,
       },
+      disclosures: true,
     },
   });
 
@@ -37,6 +42,8 @@ export default async function ProjectDetailPage({
   const price = project.listing
     ? `${project.listing.priceUSDC} USDC`
     : "Not for sale";
+
+  const transaction = project.listing?.transaction;
 
   // リスティング情報を取得
   const listing = project.listing ? project.listing : null;
@@ -172,17 +179,45 @@ export default async function ProjectDetailPage({
                             ? `$${project.valuationReports[0].estimatedValueUSD.toLocaleString()}`
                             : "N/A"}
                         </p>
+                        <p className="text-sm text-gray-500">
+                          {project.valuationReports[0].report}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
                 )}
             </TabsContent>
+            <TabsContent value="disclosures">
+              {project.disclosures.map((disclosure) => {
+                return (
+                  <Card key={disclosure.id}>
+                    <CardContent className="p-6">
+                      <CardTitle>{disclosure.title}</CardTitle>
+                      <CardDescription>{disclosure.description}</CardDescription>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </TabsContent>
             <TabsContent value="history">
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-sm text-gray-500">
-                    Transaction history will appear here
-                  </p>
+                  {transaction == null && (
+                    <p className="text-sm">
+                      Transaction history will appear here
+                    </p>
+                  )}
+                  {transaction != null && (
+                    <div className="text-sm">
+                      <p>
+                        Date: {transaction.createdAt.toLocaleDateString("ja-JP")}
+                      </p>
+                      <p>Tx Hash: {transaction.txHash}</p>
+                      <p>
+                        Price: ${transaction.priceUSDC.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

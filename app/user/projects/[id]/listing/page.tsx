@@ -366,7 +366,7 @@ export default function RegisterProjectPage() {
                   <div className="col-span-2">
                     <p className="text-gray-500">Estimated Value</p>
                     <p className="font-medium">
-                      {valuationReport?.estimatedValueUSD}
+                      ${valuationReport?.estimatedValueUSD.toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -378,7 +378,7 @@ export default function RegisterProjectPage() {
               <Input
                 id="price"
                 type="number"
-                placeholder="100 $"
+                placeholder="100"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
