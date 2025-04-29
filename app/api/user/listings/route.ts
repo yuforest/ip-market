@@ -2,19 +2,19 @@ import { db } from "@/lib/db"
 import { listings } from "@/lib/db/schema"
 import { type NextRequest, NextResponse } from "next/server"
 
-// 出品作成API
+// Create listing API
 export async function POST(req: NextRequest) {
   try {
     const { projectId, priceUSDC, saleId, escrowAddress } = await req.json()
     console.log(projectId)
     console.log(priceUSDC)
     console.log(escrowAddress)
-    // 必須項目のバリデーション
+    // Validate required fields
     if (!projectId || !priceUSDC) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // 出品を作成
+    // Create listing
     const [listing] = await db
       .insert(listings)
       .values({

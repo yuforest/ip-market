@@ -3,14 +3,14 @@ import { listings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
-// 出品更新API
+// Update listing API
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
     const listingId = params.id
     const { priceUSDC } = await req.json()
 
-    // 出品を更新
+    // Update listing
     const [updatedListing] = await db
       .update(listings)
       .set({
@@ -30,13 +30,13 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
   }
 }
 
-// 出品削除API
+// Delete listing API
 export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
     const listingId = params.id
 
-    // 出品を削除
+    // Delete listing
     const [deletedListing] = await db.delete(listings).where(eq(listings.id, listingId)).returning()
 
     if (!deletedListing) {

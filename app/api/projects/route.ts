@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 import { nftProjects } from "@/lib/db/schema"
 import { ProjectStatus } from "@/lib/db/enums"
 
-// プロジェクト一覧取得API
+// Get project list API
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url)
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const limit = Number.parseInt(url.searchParams.get("limit") || "10")
     const offset = Number.parseInt(url.searchParams.get("offset") || "0")
 
-    // クエリ条件を構築
+    // Build query conditions
     const conditions = []
 
     if (search) {
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
     conditions.push(eq(nftProjects.status, ProjectStatus.ACTIVE))
 
-    // プロジェクト一覧を取得
+    // Get project list
     const projects = await db.query.nftProjects.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
       with: {
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       offset,
     })
 
-    // 総件数を取得
+    // Get total count
     const count = await db
       .select({ count: sql<number>`count(*)` })
       .from(nftProjects)

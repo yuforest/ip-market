@@ -70,7 +70,7 @@ export default async function ProjectsPage({
           {projects.length === 0 && (
             <div className="col-span-full text-center py-10">
               <p className="text-muted-foreground">
-                現在、アクティブなプロジェクトはありません。
+                There are no active projects.
               </p>
             </div>
           )}

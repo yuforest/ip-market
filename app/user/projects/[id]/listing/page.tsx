@@ -73,12 +73,12 @@ export default function RegisterProjectPage() {
   const [valuationReport, setValuationReport] =
     useState<ValuationReport | null>(null);
 
-  // URLパラメータからプロジェクトIDを取得
+  // Get project ID from URL parameters
   const params = useParams();
   const projectId = params?.id as string;
   const router = useRouter();
 
-  // Wagmi フックを使用してウォレットクライアントとアカウント情報を取得
+  // Use Wagmi hooks to get wallet client and account information
   const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
   const config = createConfig({
@@ -94,7 +94,7 @@ export default function RegisterProjectPage() {
   const isTwitterLinked = isLinked(provider);
   const connectedAccountInfo = getLinkedAccountInformation(provider);
 
-  // プロジェクトの既存リスティングを取得
+  // Get existing listing for the project
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
@@ -117,7 +117,7 @@ export default function RegisterProjectPage() {
           setValuationReport(data.valuationReports[0]);
         }
       } catch (err) {
-        console.error("プロジェクト情報の取得に失敗:", err);
+        console.error("Failed to get project information:", err);
       }
     };
 
@@ -130,23 +130,23 @@ export default function RegisterProjectPage() {
     setSubmitting(true);
 
     if (!walletClient || !address) {
-      setError("ウォレットが接続されていません");
+      setError("Wallet is not connected");
       setSubmitting(false);
       return;
     }
 
     if (!project) {
-      setError("プロジェクトが見つかりません");
+      setError("Project not found");
       setSubmitting(false);
       return;
     }
 
     try {
-      // 価格をUSDCの小数点に変換（6桁）
+      // Convert price to USDC with 6 decimal places
       const priceInUSDC = parseUnits(price, 6);
       console.log("priceInUSDC", priceInUSDC);
 
-      // バックエンドにリスティング情報を保存
+      // Save listing information to backend
       if (listing?.id) {
         await walletClient.writeContract({
           address: escrowContractAddress as `0x${string}`,
@@ -155,7 +155,7 @@ export default function RegisterProjectPage() {
           args: [listing.saleId, priceInUSDC],
         });
 
-        // 既存のリスティングを更新
+        // Update existing listing
         await fetch(`/api/user/listings/${listing.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -165,7 +165,7 @@ export default function RegisterProjectPage() {
           }),
         });
       } else {
-        // ステップ1: コレクションに対するtransferOwnershipを設定
+        // Step 1: Set transferOwnership for the collection
         try {
           await walletClient.writeContract({
             address: project.collectionAddress as `0x${string}`,
@@ -174,22 +174,22 @@ export default function RegisterProjectPage() {
             args: [escrowContractAddress as `0x${string}`],
           });
 
-          // 所有権移転トランザクションの完了を待つ
+          // Wait for the ownership transfer transaction to complete
           await new Promise((resolve) => setTimeout(resolve, 5000));
         } catch (ownershipError) {
-          console.error("所有権移転エラー:", ownershipError);
+          console.error("Ownership transfer error:", ownershipError);
           setError(
             ownershipError instanceof Error
               ? ownershipError.message
-              : "コレクションの所有権移転に失敗しました"
+              : "Failed to transfer ownership of the collection"
           );
           setSubmitting(false);
           return;
         }
 
-        console.log("所有権移転が完了しました。リスティングを開始します。");
+        console.log("Ownership transfer completed. Starting listing.");
 
-        // ステップ2: 承認完了後にregisterSaleを実行
+        // Step 2: Execute registerSale after approval
         await walletClient.writeContract({
           address: escrowContractAddress as `0x${string}`,
           abi: escrowContractABI,
@@ -216,7 +216,7 @@ export default function RegisterProjectPage() {
         });
       }
 
-      // プロジェクトのステータスをactiveに更新
+      // Update project status to active
       await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/projects/${projectId}/status`,
         {
@@ -230,14 +230,14 @@ export default function RegisterProjectPage() {
       );
 
       setSuccess(true);
-      // ダッシュボード画面に遷移
+      // Redirect to dashboard page
       router.push("/user/dashboard");
     } catch (error) {
-      console.error("登録エラー:", error);
+      console.error("Registration error:", error);
       setError(
         error instanceof Error
           ? error.message
-          : "登録処理中にエラーが発生しました"
+          : "Registration processing error"
       );
     } finally {
       setSubmitting(false);
@@ -246,32 +246,32 @@ export default function RegisterProjectPage() {
 
   const handleStopListing = async () => {
     if (!walletClient || !address) {
-      setError("ウォレットが接続されていません");
+      setError("Wallet is not connected");
       setSubmitting(false);
       return;
     }
 
     if (!project) {
-      setError("プロジェクトが見つかりません");
+      setError("Project not found");
       setSubmitting(false);
       return;
     }
 
     if (!listing) {
-      setError("リスティングが見つかりません");
+      setError("Listing not found");
       setSubmitting(false);
       return;
     }
 
     try {
-      // リスティングを停止
+      // Stop listing
       await walletClient.writeContract({
         address: escrowContractAddress as `0x${string}`,
         abi: escrowContractABI,
         functionName: "cancelSale",
         args: [listing.saleId],
       });
-      // プロジェクトのステータスをsuspendedに更新
+      // Update project status to suspended
       await fetch(`/api/user/projects/${projectId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -280,14 +280,12 @@ export default function RegisterProjectPage() {
           projectId: projectId,
         }),
       });
-
-      // TODO: コントラクトのリスティングを停止
     } catch (error) {
-      console.error("リスティング停止エラー:", error);
+      console.error("Listing stop error:", error);
       setError(
         error instanceof Error
           ? error.message
-          : "リスティング停止処理中にエラーが発生しました"
+          : "Listing stop processing error"
       );
     }
     router.push("/user/dashboard");

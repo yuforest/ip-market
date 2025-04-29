@@ -6,7 +6,7 @@ import { and, eq, ne } from "drizzle-orm"
 import type { NextAuthRequest } from "next-auth"
 import { NextResponse } from "next/server"
 
-// プロジェクト一覧取得API
+// Get project list API
 export const GET = auth(async function GET(req: NextAuthRequest) {
   const session = await auth()
   if (!session?.user?.id) {
@@ -14,13 +14,13 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
   }
 
   try {
-    // クエリ条件を構築
+    // Build query conditions
     const conditions = [
       ne(nftProjects.status, ProjectStatus.DELETED),
       eq(nftProjects.ownerId, session?.user?.id),
     ]
 
-    // プロジェクト一覧を取得
+    // Get project list
     const projects = await db.query.nftProjects.findMany({
       where: and(...conditions),
       with: {
@@ -41,7 +41,7 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
   }
 })
 
-// プロジェクト作成API
+// Create project API
 export const POST = auth(async function POST(req: NextAuthRequest) {
   if (!req.auth?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -61,12 +61,12 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
       image,
     } = body
 
-    // 必須フィールドのバリデーション
+    // Validate required fields
     if (!name || !collectionAddress || !chainId || !description || !category) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // プロジェクトの作成
+    // Create project
     const [project] = await db
       .insert(nftProjects)
       .values({
@@ -83,7 +83,7 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
       })
       .returning()
 
-    // 開示情報の作成（存在する場合）
+    // Create disclosures (if any)  
     if (disclosures && disclosures.length > 0) {
       interface Disclosure {
         disclosureType: string
