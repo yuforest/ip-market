@@ -16,8 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { escrowContractABI } from "@/constants/abis";
 import { escrowContractAddress } from "@/constants/contracts";
+import { ProjectStatus } from "@/lib/db/enums";
 import { Listing, NftProject, ValuationReport } from "@/lib/db/schema";
-import { AlertCircle } from "lucide-react";
+import { useSocialAccounts } from "@dynamic-labs/sdk-react-core";
+import { ProviderEnum } from "@dynamic-labs/types";
+import { AlertCircle, ExternalLink } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { http, parseUnits } from "viem";
@@ -28,7 +31,6 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { ProjectStatus } from "@/lib/db/enums";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -86,6 +88,12 @@ export default function RegisterProjectPage() {
     },
   });
   const publicClient = usePublicClient({ config });
+  const { isLinked, getLinkedAccountInformation } = useSocialAccounts();
+
+  const provider = ProviderEnum.Twitter;
+  const isTwitterLinked = isLinked(provider);
+  const connectedAccountInfo = getLinkedAccountInformation(provider);
+
   // プロジェクトの既存リスティングを取得
   useEffect(() => {
     const fetchProjectData = async () => {
@@ -264,17 +272,14 @@ export default function RegisterProjectPage() {
         args: [listing.saleId],
       });
       // プロジェクトのステータスをsuspendedに更新
-      await fetch(
-        `/api/user/projects/${projectId}/status`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: "suspended",
-            projectId: projectId,
-          }),
-        }
-      );
+      await fetch(`/api/user/projects/${projectId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "suspended",
+          projectId: projectId,
+        }),
+      });
 
       // TODO: コントラクトのリスティングを停止
     } catch (error) {
@@ -369,6 +374,32 @@ export default function RegisterProjectPage() {
                       ${valuationReport?.estimatedValueUSD.toLocaleString()}
                     </p>
                   </div>
+                  {isTwitterLinked ? (
+                    <div className="col-span-2">
+                      <p className="text-gray-500">X Account</p>
+                      <p className="font-medium flex items-center">
+                        <div className="icon mr-2">
+                          <img src={connectedAccountInfo?.avatar || ""} />
+                        </div>
+                        <div className="mr-2">
+                          {connectedAccountInfo?.displayName}
+                        </div>
+                        <div>
+                          <a
+                            href={
+                              "https://x.com/" + connectedAccountInfo?.username
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                        </div>
+                      </p>
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
                 </div>
               </div>
             </div>

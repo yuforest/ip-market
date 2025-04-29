@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProjectStatus } from "@/lib/db/enums";
 import type { NftProject, ValuationReport } from "@/lib/db/schema";
+import { formatDate } from "@/lib/utils/date";
+import { useSocialAccounts } from "@dynamic-labs/sdk-react-core";
+import { ProviderEnum } from "@dynamic-labs/types";
 import { Edit, Eye, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,6 +19,16 @@ interface ProjectListProps {
 }
 
 export function ProjectList({ projects }: ProjectListProps) {
+  const {
+    linkSocialAccount,
+    unlinkSocialAccount,
+    isLinked,
+    getLinkedAccountInformation,
+  } = useSocialAccounts();
+
+  const provider = ProviderEnum.Twitter;
+  const isTwitterLinked = isLinked(provider);
+
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const router = useRouter();
 
@@ -83,15 +96,13 @@ export function ProjectList({ projects }: ProjectListProps) {
                   {project.valuationReports.length > 0 && (
                     <Badge variant="outline">
                       Valuated on{" "}
-                      {project.valuationReports[0].createdAt.toLocaleDateString()}
+                      {formatDate(project.valuationReports[0].createdAt)}
                     </Badge>
                   )}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                   <span>Category: {project.category}</span>
-                  <span>
-                    Created: {new Date(project.createdAt).toLocaleDateString()}
-                  </span>
+                  <span>Created: {formatDate(project.createdAt)}</span>
                 </div>
               </div>
               <div className="text-right">
@@ -111,7 +122,25 @@ export function ProjectList({ projects }: ProjectListProps) {
                             Edit
                           </Link>
                         </Button>
+                        <div>
+                          {isTwitterLinked ? (
+                            <Button
+                              size="sm"
+                              onClick={() => unlinkSocialAccount(provider)}
+                            >
+                              Disconnect
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => linkSocialAccount(provider)}
+                            >
+                              Connect
+                            </Button>
+                          )}
+                        </div>
                         <Button
+                          size="sm"
                           onClick={() => generateValuation(project.id)}
                           disabled={loading[project.id]}
                         >
