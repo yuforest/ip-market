@@ -1,6 +1,7 @@
 export const ProjectStatus = {
   DRAFT: "draft",
   ACTIVE: "active",
+  SUSPENDED: "suspended",
   SOLD: "sold",
   DELETED: "deleted",
 } as const;

@@ -94,7 +94,7 @@ export function ProjectList({ projects }: ProjectListProps) {
                       View
                     </Link>
                   </Button>
-                  {(project.status === ProjectStatus.ACTIVE || project.status === ProjectStatus.DRAFT) && (
+                  {(project.status !== ProjectStatus.SOLD && project.status !== ProjectStatus.DELETED) && (
                     <>
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/user/projects/${project.id}/edit`}>

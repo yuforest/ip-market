@@ -2,8 +2,6 @@
 
 import { ProjectForm } from "@/components/project-form";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { ProjectStatus } from "@/lib/db/enums";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
@@ -74,39 +72,6 @@ export default function EditProjectPage(props: {
     }
   };
 
-  const handleVisibilityToggle = async () => {
-    if (!initialData) return;
-
-    const newStatus =
-      initialData.status === ProjectStatus.ACTIVE
-        ? ProjectStatus.DRAFT
-        : ProjectStatus.ACTIVE;
-
-    try {
-      const response = await fetch(`/api/user/projects/${params.id}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus, projectId: params.id }),
-      });
-
-      if (response.ok) {
-        setInitialData({ ...initialData, status: newStatus });
-        toast.success(
-          `Project ${
-            newStatus === ProjectStatus.ACTIVE ? "published" : "unpublished"
-          } successfully`
-        );
-      } else {
-        throw new Error("Failed to update project status");
-      }
-    } catch (error) {
-      console.error("Error updating project status:", error);
-      toast.error("Failed to update project status");
-    }
-  };
-
   if (!initialData) {
     return <div>Loading...</div>;
   }
@@ -116,17 +81,6 @@ export default function EditProjectPage(props: {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Edit Project</h1>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={initialData.status === ProjectStatus.ACTIVE}
-              onCheckedChange={handleVisibilityToggle}
-            />
-            <span className="text-sm">
-              {initialData.status === ProjectStatus.ACTIVE
-                ? "Published"
-                : "Draft"}
-            </span>
-          </div>
           <Button
             variant="destructive"
             onClick={handleDelete}

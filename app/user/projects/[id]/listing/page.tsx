@@ -28,6 +28,7 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
+import { ProjectStatus } from "@/lib/db/enums";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -61,15 +62,10 @@ const erc721Abi = [
 ];
 
 export default function RegisterProjectPage() {
-  // const [projectName, setProjectName] = useState("");
-  // const [collectionAddress, setCollectionAddress] = useState("");
-  // const [description, setDescription] = useState("");
-  // const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  // const [listingId, setListingId] = useState<string | null>(null);
   const [project, setProject] = useState<NftProject | null>(null);
   const [listing, setListing] = useState<Listing | null>(null);
   const [valuationReport, setValuationReport] =
@@ -112,7 +108,6 @@ export default function RegisterProjectPage() {
           setPrice(data.listing?.priceUSDC?.toString() || "");
           setValuationReport(data.valuationReports[0]);
         }
-        console.log(valuationReport);
       } catch (err) {
         console.error("プロジェクト情報の取得に失敗:", err);
       }
@@ -241,6 +236,58 @@ export default function RegisterProjectPage() {
     }
   };
 
+  const handleStopListing = async () => {
+    if (!walletClient || !address) {
+      setError("ウォレットが接続されていません");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!project) {
+      setError("プロジェクトが見つかりません");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!listing) {
+      setError("リスティングが見つかりません");
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      // リスティングを停止
+      await walletClient.writeContract({
+        address: escrowContractAddress as `0x${string}`,
+        abi: escrowContractABI,
+        functionName: "cancelSale",
+        args: [listing.saleId],
+      });
+      // プロジェクトのステータスをsuspendedに更新
+      await fetch(
+        `/api/user/projects/${projectId}/status`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "suspended",
+            projectId: projectId,
+          }),
+        }
+      );
+
+      // TODO: コントラクトのリスティングを停止
+    } catch (error) {
+      console.error("リスティング停止エラー:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "リスティング停止処理中にエラーが発生しました"
+      );
+    }
+    router.push("/user/dashboard");
+  };
+
   if (!project) {
     return <div>Loading...</div>;
   }
@@ -341,7 +388,7 @@ export default function RegisterProjectPage() {
 
         <CardFooter className="flex justify-between">
           <Button
-            className="bg-rose-500 hover:bg-rose-600"
+            className="bg-blue-500 hover:bg-blue-600"
             onClick={handleSubmit}
             disabled={submitting}
           >
@@ -349,6 +396,18 @@ export default function RegisterProjectPage() {
           </Button>
         </CardFooter>
       </Card>
+      {project.status === ProjectStatus.ACTIVE && listing !== null && (
+        <div className="flex justify-center mt-4">
+          <Button
+            onClick={handleStopListing}
+            className="bg-red-500 hover:bg-red-600"
+            size="sm"
+            disabled={submitting}
+          >
+            {submitting ? "Stopping..." : "Stop Listing"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
