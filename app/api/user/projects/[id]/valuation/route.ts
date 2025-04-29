@@ -49,7 +49,6 @@ Category: ${project.category}
 Chain: ${project.chainId}
 Royalty Percentage: ${project.royaltyPct}%
 Last 12 Months Revenue: ${project.ltmRevenueUSD || "N/A"}
-Metadata CID: ${project.metadataCID || "N/A"}
 Disclosures: ${project.disclosures.map(disclosure => `${disclosure.disclosureType}: ${disclosure.title}`).join("\n") || "N/A"}
 
 Please provide:

@@ -1,0 +1,1 @@
+ALTER TABLE "nft_projects" DROP COLUMN "metadata_cid";

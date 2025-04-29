@@ -69,7 +69,6 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
       category,
       royaltyPct,
       ltmRevenueUSD,
-      metadataCID,
       disclosures,
     } = body
 
@@ -106,7 +105,6 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
         category,
         royaltyPct: royaltyPct || null,
         ltmRevenueUSD: ltmRevenueUSD || null,
-        metadataCID: metadataCID || null,
       })
       .where(eq(nftProjects.id, id))
       .returning()

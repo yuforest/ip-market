@@ -25,7 +25,6 @@ export const nftProjects = pgTable("nft_projects", {
   royaltyPct: doublePrecision("royalty_pct"), // プロジェクトのスマートコントラクトに設定されているロイヤリティ率
   ltmRevenueUSD: doublePrecision("ltm_revenue_usd"), // 直近12か月の収益総額（USD換算）
   ownerId: uuid("owner_id").references(() => users.id),
-  metadataCID: text("metadata_cid"), // IPFS/ArweaveのCID
   status: text("status", { enum: ["draft", "active", "sold", "deleted"] }).notNull().default(ProjectStatus.DRAFT),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

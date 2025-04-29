@@ -56,7 +56,6 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
       category,
       royaltyPct,
       ltmRevenueUSD,
-      metadataCID,
       disclosures,
       image,
     } = body
@@ -77,7 +76,6 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
         category,
         royaltyPct: royaltyPct || null,
         ltmRevenueUSD: ltmRevenueUSD || null,
-        metadataCID: metadataCID || null,
         image: image || null,
         ownerId: req.auth.user.id,
         status: ProjectStatus.DRAFT,

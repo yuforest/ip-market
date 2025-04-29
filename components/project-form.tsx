@@ -32,7 +32,6 @@ export type ProjectFormData = {
   category: string;
   royaltyPct: string;
   ltmRevenueUSD: string;
-  metadataCID: string;
   disclosures: {
     disclosureType: string;
     title: string;
@@ -62,7 +61,6 @@ export function ProjectForm({
       category: "",
       royaltyPct: "",
       ltmRevenueUSD: "",
-      metadataCID: "",
       disclosures: [
         {
           disclosureType: "",
@@ -321,16 +319,6 @@ export function ProjectForm({
                         ...formData,
                         ltmRevenueUSD: e.target.value,
                       })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="metadataCID">Metadata CID</Label>
-                  <Input
-                    id="metadataCID"
-                    value={formData.metadataCID}
-                    onChange={(e) =>
-                      setFormData({ ...formData, metadataCID: e.target.value })
                     }
                   />
                 </div>
