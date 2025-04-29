@@ -25,6 +25,8 @@ export default async function DashboardPage() {
     image: nftProjects.image,
     category: nftProjects.category,
     priceUSDC: listings.priceUSDC,
+    collectionAddress: nftProjects.collectionAddress,
+    chainId: nftProjects.chainId,
     transaction: {
       createdAt: transactions.createdAt,
       priceUSDC: transactions.priceUSDC,
@@ -35,7 +37,6 @@ export default async function DashboardPage() {
       eq(nftProjects.status, ProjectStatus.SOLD),
       eq(transactions.userId, user.id)
     ))
-  console.log(purchasedProjects);
 
   const projects = await db.query.nftProjects.findMany({
     where: and(
@@ -77,7 +78,9 @@ export default async function DashboardPage() {
                 <h3 className="font-semibold">{project.name}</h3>
                 <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                   <span>Category: {project.category}</span>
-                  <span>Purchased: {project.transaction?.createdAt.toLocaleString()}</span>
+                  <span>Purchased: {new Date(project.transaction?.createdAt).toLocaleDateString()}</span>
+                  <span>Collection Address: {project.collectionAddress}</span>
+                  <span>Chain ID: {project.chainId}</span>
                 </div>
               </div>
               <div className="text-right">
