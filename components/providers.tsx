@@ -18,6 +18,18 @@ import { soneiumMinato } from "viem/chains";
 import { WagmiProvider } from "wagmi";
 export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient();
+  const onrampOptions = (defaultOnrampOptions: any) => {
+    return [
+      ...defaultOnrampOptions,
+       {
+          id: 'relayOnramp',
+          url: 'https://www.relay.link/bridge',
+          displayName: 'Relay',
+          iconUrl: "https://www.relay.link/favicon.ico",
+          openMode: 'popup',
+        },
+    ];
+  };
 
   return (
     <DynamicContextProvider
@@ -39,8 +51,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               iconUrls: ["https://soneium.org/favicon.ico"],
               blockExplorerUrls: [soneiumMinato.blockExplorers.default.url],
             },
-
           ],
+          onrampOptions,
         },
         events: {
           onAuthSuccess: async (event) => {
