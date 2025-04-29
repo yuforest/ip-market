@@ -30,7 +30,7 @@ export default function HomePage() {
                   size="lg"
                   className="bg-rose-500 hover:bg-rose-600"
                 >
-                  <Link href="/register">
+                  <Link href="/projects/new">
                     List Your NFT Project
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

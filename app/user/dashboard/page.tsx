@@ -81,7 +81,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-rose-500">{project.transaction?.priceUSDC}</div>
+                <div className="font-bold text-rose-500">${project.transaction?.priceUSDC.toLocaleString()}</div>
               </div>
             </div>
           </div>
