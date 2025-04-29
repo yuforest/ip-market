@@ -9,7 +9,7 @@ export async function POST(
   props: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 認証チェック
+    // Check authentication
     const session = await auth()
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -37,9 +37,9 @@ export async function POST(
       return NextResponse.json({ error: "Listing is not active" }, { status: 400 })
     }
 
-    // トランザクションを開始
+    // Start transaction
     const result = await db.transaction(async (tx) => {
-      // 取引を作成
+      // Create transaction
       const [transaction] = await tx
         .insert(transactions)
         .values({
@@ -50,13 +50,13 @@ export async function POST(
         })
         .returning()
 
-      // プロジェクトのステータスを更新
+      // Update project status
       await tx
         .update(nftProjects)
         .set({ status: "sold" })
         .where(eq(nftProjects.id, projectId))
 
-      // 販売者に通知を送信
+      // Send notification to seller
       await tx
         .insert(notifications)
         .values({

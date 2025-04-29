@@ -44,7 +44,7 @@ export default function BuyNowButton({
     try {
       setIsLoading(true);
 
-      // USDCの承認トランザクション
+      // USDC approval transaction
       await walletClient.writeContract({
         address: "0xE9A198d38483aD727ABC8b0B1e16B2d338CF0391" as `0x${string}`,
         abi: ERC20_ABI,
@@ -52,7 +52,7 @@ export default function BuyNowButton({
         args: [escrowContractAddress, BigInt(price * 10 ** 6)],
       });
 
-      // 購入トランザクションの実行
+      // Execute purchase transaction
       const txHash = await walletClient.writeContract({
         address: escrowContractAddress as `0x${string}`,
         abi: escrowContractABI,
@@ -60,7 +60,7 @@ export default function BuyNowButton({
         args: [saleId],
       });
 
-      // バックエンドAPIを呼び出してDBを更新
+      // Call backend API to update DB
       const response = await fetch(`/api/projects/${project.id}/purchase`, {
         method: "POST",
         headers: {
@@ -73,12 +73,12 @@ export default function BuyNowButton({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "購入処理に失敗しました");
+        throw new Error(errorData.error || "Purchase failed");
       }
 
       router.push("/user/dashboard");
     } catch (error) {
-      console.error("購入処理中にエラーが発生しました:", error);
+      console.error("Error during purchase:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +86,7 @@ export default function BuyNowButton({
 
   return (
     <Button onClick={handleBuy} disabled={isLoading}>
-      {isLoading ? "処理中..." : "購入する"}
+      {isLoading ? "Processing..." : "Buy Now"}
     </Button>
   );
 }

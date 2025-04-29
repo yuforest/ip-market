@@ -15,7 +15,7 @@ export default async function ProjectDetailPage({
   params: { id: string };
 }) {
   const { id } = await params;
-  // データベースからプロジェクト情報を取得
+  // Get project information from database
   const project = await db.query.nftProjects.findFirst({
     where: eq(nftProjects.id, id),
     with: {
@@ -33,19 +33,19 @@ export default async function ProjectDetailPage({
     },
   });
 
-  // プロジェクトが見つからない場合は404ページを表示
+  // If project is not found, show 404 page
   if (!project) {
     notFound();
   }
 
-  // リスティング情報から価格を取得
+  // Get price from listing information
   const price = project.listing
     ? `${project.listing.priceUSDC} USDC`
     : "Not for sale";
 
   const transaction = project.listing?.transaction;
 
-  // リスティング情報を取得
+  // Get listing information
   const listing = project.listing ? project.listing : null;
 
   return (

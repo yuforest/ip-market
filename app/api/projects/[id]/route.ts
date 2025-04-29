@@ -3,13 +3,13 @@ import { nftProjects } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
-// プロジェクト詳細取得API
+// Get project details API
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
     const projectId = params.id
 
-    // プロジェクト詳細を取得
+    // Get project details
     const project = await db.query.nftProjects.findFirst({
       where: and(eq(nftProjects.id, projectId)),
       with: {

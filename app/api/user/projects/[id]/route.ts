@@ -6,7 +6,7 @@ import { and, eq, ne } from "drizzle-orm"
 import type { NextAuthRequest } from "next-auth"
 import { NextResponse } from "next/server"
 
-// プロジェクト詳細取得API
+// Get project details API
 export const GET = auth(async function GET(req: NextAuthRequest) {
   if (!req.auth?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -18,7 +18,7 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
   }
 
   try {
-    // プロジェクト詳細を取得
+    // Get project details
     const project = await db.query.nftProjects.findFirst({
       where: and(
         eq(nftProjects.id, id),
@@ -47,7 +47,7 @@ export const GET = auth(async function GET(req: NextAuthRequest) {
   }
 })
 
-// プロジェクト更新API
+// Update project API
 export const PUT = auth(async function PUT(req: NextAuthRequest) {
   if (!req.auth?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -72,7 +72,7 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
       disclosures,
     } = body
 
-    // 必須フィールドのバリデーション
+    // Validate required fields
     if (!name || !collectionAddress || !chainId || !description || !category) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -80,7 +80,7 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
       )
     }
 
-    // プロジェクトの所有者確認
+    // Confirm the project owner
     const existingProject = await db.query.nftProjects.findFirst({
       where: and(
         eq(nftProjects.id, id),
@@ -93,7 +93,7 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    // プロジェクトの更新
+    // Update the project
     const [project] = await db
       .update(nftProjects)
       .set({
@@ -109,12 +109,12 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
       .where(eq(nftProjects.id, id))
       .returning()
 
-    // 既存の開示情報を削除
+    // Delete existing disclosures
     await db
       .delete(projectDisclosures)
       .where(eq(projectDisclosures.projectId, id))
 
-    // 新しい開示情報を作成（存在する場合）
+    // Create new disclosures (if any)
     if (disclosures && disclosures.length > 0) {
       const disclosureValues = disclosures.map((disclosure: any) => ({
         projectId: id,
@@ -133,7 +133,7 @@ export const PUT = auth(async function PUT(req: NextAuthRequest) {
   }
 })
 
-// プロジェクト削除API
+// Delete project API
 export const DELETE = auth(async function DELETE(req: NextAuthRequest) {
   if (!req.auth?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -145,7 +145,7 @@ export const DELETE = auth(async function DELETE(req: NextAuthRequest) {
   }
 
   try {
-    // プロジェクトの所有者確認
+    // Confirm the project owner
     const existingProject = await db.query.nftProjects.findFirst({
       where: and(
         eq(nftProjects.id, id),

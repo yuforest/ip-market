@@ -32,7 +32,7 @@ export async function POST(
 
     const modelVersion = "gpt-4o"
 
-    // ChatGPTにプロジェクトの価値を算出させる
+    // Using OpenAI to generate a valuation report
     const completion = await openai.chat.completions.create({
       messages: [
         {

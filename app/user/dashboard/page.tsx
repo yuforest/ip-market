@@ -18,7 +18,7 @@ export default async function DashboardPage() {
   if (!user) {
     redirect("/login");
   }
-  // 自分が購入したプロジェクトを取得
+  // Get purchased projects
   const purchasedProjects = await db.select({
     id: nftProjects.id,
     name: nftProjects.name,
