@@ -83,14 +83,14 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
       })
       .returning()
 
-    // Create disclosures (if any)  
+    // Create disclosures (if any)
     if (disclosures && disclosures.length > 0) {
       interface Disclosure {
         disclosureType: string
         title: string
         description: string
       }
-      
+
       const disclosureValues = disclosures.map((disclosure: Disclosure) => ({
         projectId: project.id,
         disclosureType: disclosure.disclosureType,

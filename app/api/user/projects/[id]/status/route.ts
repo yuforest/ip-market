@@ -21,7 +21,7 @@ export async function PUT(request: Request) {
     const [project] = await db
       .select()
       .from(nftProjects)
-      .where(and(eq(nftProjects.id, projectId), or(eq(nftProjects.status, ProjectStatus.ACTIVE), eq(nftProjects.status, ProjectStatus.DRAFT))))
+      .where(and(eq(nftProjects.id, projectId), or(eq(nftProjects.status, ProjectStatus.ACTIVE), eq(nftProjects.status, ProjectStatus.DRAFT), eq(nftProjects.status, ProjectStatus.SUSPENDED))))
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
