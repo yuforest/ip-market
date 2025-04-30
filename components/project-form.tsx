@@ -30,7 +30,6 @@ export type ProjectFormData = {
   description: string;
   image?: string;
   category: string;
-  royaltyPct: string;
   ltmRevenueUSD: string;
   disclosures: {
     disclosureType: string;
@@ -59,7 +58,6 @@ export function ProjectForm({
       image: "",
       description: "",
       category: "",
-      royaltyPct: "",
       ltmRevenueUSD: "",
       disclosures: [
         {
@@ -296,17 +294,6 @@ export function ProjectForm({
                       <SelectItem value="Utility">Utility</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="royaltyPct">Royalty Percentage</Label>
-                  <Input
-                    id="royaltyPct"
-                    type="number"
-                    value={formData.royaltyPct}
-                    onChange={(e) =>
-                      setFormData({ ...formData, royaltyPct: e.target.value })
-                    }
-                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ltmRevenueUSD">LTM Revenue (USD)</Label>

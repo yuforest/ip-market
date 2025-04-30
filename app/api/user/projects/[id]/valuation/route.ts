@@ -1,8 +1,8 @@
-import { eq } from "drizzle-orm"
-import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { nftProjects, valuationReports } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
+import { type NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
 
 const openai = new OpenAI({
@@ -47,7 +47,6 @@ Collection Address: ${project.collectionAddress}
 Description: ${project.description}
 Category: ${project.category}
 Chain: ${project.chainId}
-Royalty Percentage: ${project.royaltyPct}%
 Last 12 Months Revenue: ${project.ltmRevenueUSD || "N/A"}
 Disclosures: ${project.disclosures.map(disclosure => `${disclosure.disclosureType}: ${disclosure.title}`).join("\n") || "N/A"}
 

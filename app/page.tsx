@@ -1,8 +1,8 @@
-import { ArrowRight, RefreshCw, Shield, Sparkles } from "lucide-react";
-import Link from "next/link";
 import FeaturedProjects from "@/components/featured-projects";
 import HowItWorks from "@/components/how-it-works";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, RefreshCw, Shield, Sparkles } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -21,8 +21,10 @@ export default function HomePage() {
                 Entire NFT Collections
               </h1>
               <p className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Transfer IP, community, and smart contract management rights all
-                at once. Secure and one-stop transactions on the blockchain.
+                IP ownership can be bought and sold through smart contracts.
+                Secure, one-stop, easy transactions on the blockchain.
+                <br /> AI-based valuation of NFT collections allows both sellers
+                and buyers to make transactions at acceptable rates.
               </p>
               <div className="flex flex-col md:flex-row gap-3">
                 <Button
@@ -45,7 +47,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-200 to-teal-200 rounded-2xl transform rotate-3"></div>
                 <div className="absolute inset-0 bg-white rounded-2xl shadow-lg overflow-hidden">
                   <img
-                    src="https://placeholder.pics/svg/500"
+                    src="/top.png"
                     alt="NFT IP Marketplace"
                     className="w-full h-full object-cover"
                   />

@@ -48,7 +48,6 @@ export async function generateProjectValuation(projectId: string): Promise<{
               name: project.name,
               description: project.description,
               category: project.category,
-              royaltyPct: project.royaltyPct,
               ltmRevenueUSD: project.ltmRevenueUSD,
               disclosures: project.disclosures,
             },
@@ -81,7 +80,6 @@ function extractProjectFeatures(project: any) {
   return {
     name: project.name,
     category: project.category,
-    royaltyPct: project.royaltyPct || 0,
     ltmRevenueUSD: project.ltmRevenueUSD || 0,
     disclosureCount: project.disclosures?.length || 0,
     hasFinancialDisclosure: project.disclosures?.some((d: any) => d.disclosureType === "financial") || false,

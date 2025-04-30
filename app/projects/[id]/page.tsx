@@ -90,10 +90,6 @@ export default async function ProjectDetailPage({
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-500">Royalty</p>
-                <p>{project.royaltyPct ? `${project.royaltyPct}%` : "N/A"}</p>
-              </div>
-              <div className="space-y-1">
                 <p className="text-sm text-gray-500">Created</p>
                 <p>{new Date(project.createdAt).toLocaleDateString("ja-JP")}</p>
               </div>

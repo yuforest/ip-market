@@ -22,7 +22,6 @@ export const nftProjects = pgTable("nft_projects", {
   chainId: text("chain_id").notNull(),
   description: text("description").notNull(),
   category: text("category", { enum: ["Art", "PFP", "Game", "Music", "Utility"] }).notNull(),
-  royaltyPct: doublePrecision("royalty_pct"), // プロジェクトのスマートコントラクトに設定されているロイヤリティ率
   ltmRevenueUSD: doublePrecision("ltm_revenue_usd"), // 直近12か月の収益総額（USD換算）
   ownerId: uuid("owner_id").references(() => users.id),
   status: text("status", { enum: ["draft", "active", "suspended", "sold", "deleted"] }).notNull().default(ProjectStatus.DRAFT),
