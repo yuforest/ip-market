@@ -11,9 +11,9 @@ import { db } from "@/lib/db";
 import { nftProjects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { ExternalLink } from "lucide-react";
+import { marked } from "marked";
 import { notFound } from "next/navigation";
 import BuyNowButton from "./buy-now-button";
-import { marked } from "marked";
 
 export default async function ProjectDetailPage({
   params,
@@ -98,6 +98,15 @@ export default async function ProjectDetailPage({
                 <p>{new Date(project.createdAt).toLocaleDateString("ja-JP")}</p>
               </div>
             </div>
+          </div>
+          <div className="mt-12">
+            <p className="text-sm prose">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: marked(project.valuationReports[0].report) as string,
+                }}
+              />
+            </p>
           </div>
         </div>
 
@@ -189,13 +198,6 @@ export default async function ProjectDetailPage({
                           {project.valuationReports[0].estimatedValueUSD
                             ? `$${project.valuationReports[0].estimatedValueUSD.toLocaleString()}`
                             : "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-500 prose">
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: marked(project.valuationReports[0].report) as string,
-                            }}
-                          />
                         </p>
                       </div>
                     </CardContent>

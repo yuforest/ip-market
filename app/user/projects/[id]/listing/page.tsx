@@ -21,6 +21,7 @@ import { Listing, NftProject, ValuationReport } from "@/lib/db/schema";
 import { useSocialAccounts } from "@dynamic-labs/sdk-react-core";
 import { ProviderEnum } from "@dynamic-labs/types";
 import { AlertCircle, ExternalLink } from "lucide-react";
+import { marked } from "marked";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { http, parseUnits } from "viem";
@@ -31,7 +32,6 @@ import {
   usePublicClient,
   useWalletClient,
 } from "wagmi";
-import { marked } from "marked";
 
 // ERC721のABIのみを定義
 const erc721Abi = [
@@ -236,9 +236,7 @@ export default function RegisterProjectPage() {
     } catch (error) {
       console.error("Registration error:", error);
       setError(
-        error instanceof Error
-          ? error.message
-          : "Registration processing error"
+        error instanceof Error ? error.message : "Registration processing error"
       );
     } finally {
       setSubmitting(false);
@@ -284,9 +282,7 @@ export default function RegisterProjectPage() {
     } catch (error) {
       console.error("Listing stop error:", error);
       setError(
-        error instanceof Error
-          ? error.message
-          : "Listing stop processing error"
+        error instanceof Error ? error.message : "Listing stop processing error"
       );
     }
     router.push("/user/dashboard");
@@ -365,10 +361,12 @@ export default function RegisterProjectPage() {
                   </div>
                   <div className="col-span-2">
                     <p className="text-gray-500">Report</p>
-                    <div className="prose">
+                    <div className="prose bg-white p-6 rounded-lg shadow-sm border border-gray-100 my-4 max-w-none">
                       <div
                         dangerouslySetInnerHTML={{
-                          __html: marked(valuationReport?.report || "") as string,
+                          __html: marked(
+                            valuationReport?.report || ""
+                          ) as string,
                         }}
                       />
                     </div>
