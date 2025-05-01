@@ -1,10 +1,37 @@
 import FeaturedProjects from "@/components/featured-projects";
 import HowItWorks from "@/components/how-it-works";
 import { Button } from "@/components/ui/button";
+import { NftProject } from "@/lib/db/schema";
 import { ArrowRight, RefreshCw, Shield, Sparkles } from "lucide-react";
 import Link from "next/link";
 
-export default function HomePage() {
+export async function getProjects() {
+  const queryParams = new URLSearchParams();
+
+  queryParams.set("limit", "1");
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/projects?${queryParams.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to get projects: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export default async function HomePage() {
+  const res = await getProjects();
+  const projects = res.projects as NftProject[];
+  console.log(projects);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -12,9 +39,6 @@ export default function HomePage() {
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
             <div className="flex flex-col justify-center space-y-4">
-              <div className="inline-block px-3 py-1 rounded-full bg-rose-100 text-rose-800 font-medium text-sm mb-2">
-                NFT IP Marketplace
-              </div>
               <h1 className="text-3xl md:text-5xl font-bold tracking-tighter">
                 Buy and Sell
                 <br />
@@ -47,8 +71,10 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-200 to-teal-200 rounded-2xl transform rotate-3"></div>
                 <div className="absolute inset-0 bg-white rounded-2xl shadow-lg overflow-hidden">
                   <img
-                    src="/top.png"
-                    alt="NFT IP Marketplace"
+                    src={
+                      projects[0]?.image || "https://placeholder.pics/svg/500"
+                    }
+                    alt="NFT IP Market"
                     className="w-full h-full object-cover"
                   />
                 </div>
