@@ -170,3 +170,4 @@ export type NftProject = typeof nftProjects.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
 export type ValuationReport = typeof valuationReports.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+export type ProjectDisclosure = typeof projectDisclosures.$inferSelect;
