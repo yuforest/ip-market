@@ -35,6 +35,8 @@ Please include the following items
    - Assumptions for each method, sensitivity analysis, and valuation by range  
 10. final valuation at USDC
 
+Do not nest list elements.
+Also, when converting markdown to html, do not put p inside li.
 The response should be a JSON object like below.
 Not include any other text or formatting like \`\`\`json or \`\`\`
 
