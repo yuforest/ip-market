@@ -11,7 +11,7 @@ import { ProviderEnum } from "@dynamic-labs/types";
 import { Edit, Eye, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface ProjectListProps {
@@ -28,9 +28,27 @@ export function ProjectList({ projects }: ProjectListProps) {
 
   const provider = ProviderEnum.Twitter;
   const isTwitterLinked = isLinked(provider);
+  const linkedAccount = getLinkedAccountInformation(provider);
 
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const router = useRouter();
+
+  useEffect(() => {
+    if (linkedAccount) {
+      const { avatar, username } = linkedAccount;
+      // Define and call an async function
+      const saveTwitterInfo = async () => {
+        await fetch(`/api/user/twitter`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ avatar, username }),
+        });
+      };
+      saveTwitterInfo();
+    }
+  }, [linkedAccount]);
 
   const generateValuation = async (projectId: string) => {
     try {

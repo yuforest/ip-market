@@ -9,6 +9,8 @@ export const users = pgTable("users", {
   address: text("address").notNull().default(""),
   chain: text("chain").notNull().default(""),
   dynamicWalletId: text("dynamic_wallet_id").notNull().default("").unique(), // WalletのIDを保存
+  twitterUsername: text("twitter_username"),
+  twitterProfileImageUrl: text("twitter_profile_image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
