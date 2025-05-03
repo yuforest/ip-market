@@ -31,7 +31,7 @@ export default function HelpPage() {
     },
     {
       question: "What are the fees?",
-      answer: "We charge a 3% fee to the seller when a transaction is completed. There are no registration fees or monthly charges.",
+      answer: "We charge a 0.1% fee to the seller when a transaction is completed. There are no registration fees or monthly charges.",
     },
   ]
 

@@ -14,8 +14,8 @@ contract Escrow is Ownable, ReentrancyGuard {
     // USDC トークンのインターフェース
     IERC20 public immutable usdcToken;
 
-    // プラットフォーム手数料率（3%）
-    uint256 public constant FEE_RATE = 300; // 3.00%
+    // プラットフォーム手数料率（0.1%）
+    uint256 public constant FEE_RATE = 10; // 0.10%
     uint256 public constant FEE_DENOMINATOR = 10000;
 
     // セール情報
@@ -85,6 +85,13 @@ contract Escrow is Ownable, ReentrancyGuard {
     ) external returns (uint256) {
         require(collectionAddress != address(0), "Invalid collection address");
         require(price > 0, "Price must be greater than zero");
+
+        // コレクションのオーナーが出品者と一致するか確認
+        Ownable collection = Ownable(collectionAddress);
+        require(
+            collection.owner() == msg.sender,
+            "Seller must be the owner of the collection"
+        );
 
         uint256 saleId = _nextSaleId++;
         _sales[saleId] = Sale({

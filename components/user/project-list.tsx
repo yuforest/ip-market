@@ -146,14 +146,14 @@ export function ProjectList({ projects }: ProjectListProps) {
                               size="sm"
                               onClick={() => unlinkSocialAccount(provider)}
                             >
-                              Disconnect
+                              X Disconnect
                             </Button>
                           ) : (
                             <Button
                               size="sm"
                               onClick={() => linkSocialAccount(provider)}
                             >
-                              Connect
+                              X Connect
                             </Button>
                           )}
                         </div>
