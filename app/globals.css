@@ -106,7 +106,7 @@
     @apply text-base font-bold mb-2 mt-3;
   }
   p {
-    @apply text-sm leading-relaxed mb-4;
+    @apply text-sm leading-relaxed mb-2;
   }
   ul,
   ol {
