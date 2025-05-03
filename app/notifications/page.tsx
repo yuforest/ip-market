@@ -76,7 +76,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="container px-4 py-8 md:px-6 md:px-6 md:py-12">
+    <div className="container px-4 py-8 md:px-6 md:py-12">
       <div className="flex flex-col gap-6">
         <div className="flex justify-between items-center">
           <div>

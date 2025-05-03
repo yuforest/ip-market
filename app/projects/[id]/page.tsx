@@ -199,6 +199,19 @@ export default async function ProjectDetailPage({
                     </CardContent>
                   </Card>
                 )}
+                {project.owner?.twitterUsername && project.owner?.twitterProfileImageUrl && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="font-medium mb-2">
+                        Owner's Twitter Account
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <img src={project.owner.twitterProfileImageUrl} alt={project.owner.twitterUsername} className="w-10 h-10 rounded-full" />
+                        <p className="text-sm text-gray-500">{project.owner.twitterUsername}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
             </TabsContent>
             <TabsContent value="disclosures">
               {project.disclosures.map((disclosure) => {
