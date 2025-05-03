@@ -121,6 +121,9 @@
   li {
     @apply mb-2;
   }
+  li p {
+    @apply inline-block;
+  }
   a {
     @apply text-blue-600 hover:underline;
   }
