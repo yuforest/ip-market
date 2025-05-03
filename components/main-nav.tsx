@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { Bell, Menu } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -11,8 +12,10 @@ import { useState } from "react";
 export function MainNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
 
-  const routes = [
+  const publicRoutes = [
     {
       href: "/",
       label: "Home",
@@ -23,6 +26,9 @@ export function MainNav() {
       label: "Marketplace",
       active: pathname === "/projects",
     },
+  ];
+
+  const privateRoutes = [
     {
       href: "/user/projects/new",
       label: "Register Project",
@@ -34,6 +40,9 @@ export function MainNav() {
       active: pathname === "/user/dashboard",
     },
   ];
+
+  // Combine routes based on authentication status
+  const routes = [...publicRoutes, ...(isAuthenticated ? privateRoutes : [])];
 
   return (
     <div className="flex items-center">
@@ -81,14 +90,16 @@ export function MainNav() {
 
               {/* Mobile icon links */}
               <div className="flex flex-col gap-2 mt-4 border-t pt-4">
-                <Link
-                  href="/notifications"
-                  className="flex items-center gap-2 p-2 text-muted-foreground hover:text-primary"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Bell className="h-5 w-5" />
-                  <span>Notifications</span>
-                </Link>
+                {isAuthenticated && (
+                  <Link
+                    href="/notifications"
+                    className="flex items-center gap-2 p-2 text-muted-foreground hover:text-primary"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Bell className="h-5 w-5" />
+                    <span>Notifications</span>
+                  </Link>
+                )}
               </div>
             </nav>
           </SheetContent>
