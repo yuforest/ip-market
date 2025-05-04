@@ -86,13 +86,6 @@ contract Escrow is Ownable, ReentrancyGuard {
         require(collectionAddress != address(0), "Invalid collection address");
         require(price > 0, "Price must be greater than zero");
 
-        // コレクションのオーナーが出品者と一致するか確認
-        Ownable collection = Ownable(collectionAddress);
-        require(
-            collection.owner() == msg.sender,
-            "Seller must be the owner of the collection"
-        );
-
         uint256 saleId = _nextSaleId++;
         _sales[saleId] = Sale({
             collectionAddress: collectionAddress,
