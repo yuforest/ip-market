@@ -6,6 +6,7 @@ import "ts-node/register";
 dotenv.config();
 
 const PK = process.env.PRIVATE_KEY || "";
+const SCS_API_KEY = process.env.SCS_API_KEY || "";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
@@ -13,7 +14,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
     minato: {
-      url: "https://rpc.minato.soneium.org",
+      url: `https://soneium-minato.rpc.scs.startale.com?apikey=${SCS_API_KEY}`,
       accounts: [PK],
     },
   },

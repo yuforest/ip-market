@@ -36,28 +36,28 @@ async function main() {
     const demoNftAddress = receipt.contractAddress;
     console.log("DemoNFT デプロイ完了:", demoNftAddress);
 
-    // Escrow のデプロイ
-    console.log("Escrow コントラクトをデプロイ中...");
-    
-    // アーティファクトの読み込み
-    const EscrowArtifact = await hre.artifacts.readArtifact("Escrow");
-    
-    // デプロイハッシュの取得
-    const escrowDeployHash = await deployer.deployContract({
-      abi: EscrowArtifact.abi,
-      bytecode: EscrowArtifact.bytecode,
-      args: [usdcAddress]
-    });
-    
-    // トランザクション待機
-    const escrowReceipt = await publicClient.waitForTransactionReceipt({ hash: escrowDeployHash });
-    
-    if (!escrowReceipt.contractAddress) {
-      throw new Error("Escrowコントラクトのデプロイに失敗しました");
-    }
-    
-    const escrowAddress = escrowReceipt.contractAddress;
-    console.log("Escrow デプロイ完了:", escrowAddress);
+    // // Escrow のデプロイ
+    // console.log("Escrow コントラクトをデプロイ中...");
+    // 
+    // // アーティファクトの読み込み
+    // const EscrowArtifact = await hre.artifacts.readArtifact("Escrow");
+    // 
+    // // デプロイハッシュの取得
+    // const escrowDeployHash = await deployer.deployContract({
+    //   abi: EscrowArtifact.abi,
+    //   bytecode: EscrowArtifact.bytecode,
+    //   args: [usdcAddress]
+    // });
+    // 
+    // // トランザクション待機
+    // const escrowReceipt = await publicClient.waitForTransactionReceipt({ hash: escrowDeployHash });
+    // 
+    // if (!escrowReceipt.contractAddress) {
+    //   throw new Error("Escrowコントラクトのデプロイに失敗しました");
+    // }
+    // 
+    // const escrowAddress = escrowReceipt.contractAddress;
+    // console.log("Escrow デプロイ完了:", escrowAddress);
 
     console.log("デプロイ処理が完了しました");
     console.log({

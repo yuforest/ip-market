@@ -8,6 +8,10 @@ Welcome to NFT IP Market—an innovative NFT-M&A platform built to make digital-
 
 <img src="public/Monosnap nft_ip_marketv110.png"/>
 
+## Node
+
+SCS
+
 ## Environment Variables Setup
 
 1. Create a `.env` file in the root directory of the project from `.env.sample`
@@ -35,6 +39,14 @@ Welcome to NFT IP Market—an innovative NFT-M&A platform built to make digital-
 - Create/login to your account on [OpenAI](https://platform.openai.com/)
 - Generate a new API key from the API key section
 
+### NEXT_PUBLIC_SCS_API_KEY and SCS_API_KEY
+
+- Register for an account on [Startale Cloud Service (SCS)](https://cloud.startale.com/)
+- Create a new API key from your dashboard
+- Set up both environment variables with the same API key value:
+  - `NEXT_PUBLIC_SCS_API_KEY` - For client-side code (React components)
+  - `SCS_API_KEY` - For server-side code (Hardhat configuration)
+
 ## Add tokens
 
 ### Seller
@@ -57,8 +69,12 @@ Run the development server:
 npm run dev
 ```
 
-## Drizzle commands
+## Drizzle Commands
 
 After changing `db/schema.ts`,
 Run `npm run db:generate` (to generate migration files) and `npm run db:migrate` (to execute migrations) to reflect the schema changes in the database.
 You can use `npm run db:studio` to operate the database through a GUI.
+
+## Contract Deploy Commend
+
+- npx hardhat run scripts/deploy.js --network minato

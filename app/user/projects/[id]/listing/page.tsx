@@ -85,7 +85,11 @@ export default function RegisterProjectPage() {
   const config = createConfig({
     chains: [soneiumMinato],
     transports: {
-      [soneiumMinato.id]: http(),
+      [soneiumMinato.id]: http(
+        `https://soneium-minato.rpc.scs.startale.com?apikey=${
+          process.env.NEXT_PUBLIC_SCS_API_KEY || ""
+        }`
+      ),
     },
   });
   const publicClient = usePublicClient({ config });
@@ -305,7 +309,7 @@ export default function RegisterProjectPage() {
           Ownership verification will be performed after wallet connection.
           <br />
           When a listed NFT collection is purchased, the owner of the NFT
-          collection becomes the buyer's wallet address.
+          collection becomes the buyer&apos;s wallet address.
         </AlertDescription>
       </Alert>
 
