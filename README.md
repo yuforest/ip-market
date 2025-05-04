@@ -1,3 +1,15 @@
+# IP NFT Market
+
+<img src="public/logo.png"/>
+
+## Overview
+
+Welcome to NFT IP Market—an innovative NFT-M&A platform built to make digital-IP deals secure, comprehensive, and lightning-fast. Every transaction delivers on-chain security, bulk transfer of IP + community rights, and near-instant execution.
+
+## System Architecture
+
+<img src="public/Monosnap nft_ip_marketv110.png"/>
+
 ## Environment Variables Setup
 
 1. Create a `.env` file in the root directory of the project from `.env.sample`
