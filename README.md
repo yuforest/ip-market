@@ -1,6 +1,4 @@
-# IP NFT Market
-
-<img src="public/logo.png"/>
+<img src="public/logo.png" width="100%"/>
 
 ## Overview
 
